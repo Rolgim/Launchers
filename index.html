@@ -1,0 +1,2035 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Space launchers in 3D, stage by stage, compared at the same scale, with sourced facts. In English and French.">
+<title>Launchers</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#14171A">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>[hidden]{display:none!important}</style>
+<style>
+/* Parti pris : une fiche technique imprimée (papier gris froid, encre noire, une seule famille de caractères)
+   posée à côté d'un hublot noir sur la maquette. Un seul accent : le bleu de surlignage, réservé à « ce qui est sélectionné ». */
+:root{
+  --paper:#ECEEEF; --sheet:#F7F8F8; --ink:#14171A; --ink-2:#3A4147; --mute:#5A6369; --rule:#C8CDD1; --rule-2:#98A1A7;
+  --mark:#C2410C; --on-mark:#FFFFFF; --black:#000; --ok:#0B7A4B; --on-ok:#FFFFFF; --on-bad:#FFFFFF; --warn:#8A5200; --bad:#B3261E;
+  --f:'Archivo', 'Helvetica Neue', Arial, sans-serif; --f-code:'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --gl:max(16px, env(safe-area-inset-left, 0px)); --gr:max(16px, env(safe-area-inset-right, 0px));
+  color-scheme: light;
+}
+/* thème sombre : gris anthracite, distinct du noir du ciel */
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --paper:#1C1F22; --sheet:#262A2E; --ink:#F1F3F4; --ink-2:#C6CCD1; --mute:#939CA3; --rule:#3B4147; --rule-2:#5C656D; --ok:#2FA872; --on-ok:#0E1A14; --on-bad:#14171A; --warn:#E3A33C; --bad:#D9463C; color-scheme:dark; } }
+:root[data-theme="dark"]{ --paper:#1C1F22; --sheet:#262A2E; --ink:#F1F3F4; --ink-2:#C6CCD1; --mute:#939CA3; --rule:#3B4147; --rule-2:#5C656D; --ok:#2FA872; --on-ok:#0E1A14; --on-bad:#14171A; --warn:#E3A33C; --bad:#D9463C; color-scheme:dark; }
+/* couleurs neutres écrites dans les SVG générés : ramenées aux jetons du thème */
+svg [fill="#14171A"]{ fill:var(--ink); } svg [stroke="#14171A"]{ stroke:var(--ink); }
+svg [fill="#3A4147"]{ fill:var(--ink-2); } svg [stroke="#3A4147"]{ stroke:var(--ink-2); }
+svg [fill="#667077"]{ fill:var(--mute); } svg [stroke="#98A1A7"]{ stroke:var(--rule-2); } svg [stroke="#C8CDD1"]{ stroke:var(--rule); }
+svg [fill="#F7F8F8"]{ fill:var(--sheet); } svg [fill="#ECEEEF"]{ fill:var(--paper); }
+svg [fill="#FFD21F"][stroke="#14171A"]{ stroke:var(--on-mark); }
+*{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html, body{ height:100%; }
+body{ margin:0; background:var(--paper); color:var(--ink); font-family:var(--f); font-size:14px; overflow:hidden; }
+button{ font-family:inherit; color:inherit; }
+button:focus-visible, a:focus-visible, input:focus-visible{ outline:2px solid var(--ink); outline-offset:2px; }
+#stage button:focus-visible, #stage input:focus-visible{ outline-color:#fff; outline-offset:3px; }
+
+#app{ height:100%; display:flex; flex-direction:column; min-height:0; position:relative; }
+
+/* ---------- en-tête ---------- */
+#top{ flex:none; display:flex; min-height:55px; align-items:stretch; gap:24px; padding-left:var(--gl); padding-right:var(--gr); background:var(--paper); }
+.brand{ display:flex; align-items:center; min-width:0; padding-block:11px; }
+.hub-link{ display:flex; align-items:center; color:inherit; margin-right:10px; padding:4px; margin-left:-4px; border-radius:4px; }
+.hub-link:hover{ background:var(--sheet); }
+.brand h1{ font-weight:800; font-stretch:75%; font-size:21px; letter-spacing:.1px; margin:0; white-space:nowrap; }
+/* navigation en deux rangées : domaines spectraux (filtres), puis observatoires du domaine choisi */
+#tabs{ display:flex; flex-direction:column; margin-left:auto; min-width:0; }
+.drow, .trow{ display:flex; overflow-x:auto; scrollbar-width:none; min-width:0; }
+.drow::-webkit-scrollbar, .trow::-webkit-scrollbar{ display:none; }
+.trow{ flex:1; justify-content:flex-end; }
+.drow{ justify-content:flex-end; gap:2px; padding-top:5px; }
+.dsel{ flex:none; border:0; background:transparent; color:var(--mute); font-size:12px; font-weight:500; padding:2px 8px 3px; cursor:pointer; border-bottom:2px solid transparent; display:flex; align-items:baseline; gap:4px; white-space:nowrap; }
+.dsel:hover{ color:var(--ink); }
+.dsel[aria-pressed="true"]{ color:var(--ink); font-weight:700; border-bottom-color:var(--ink); }
+.dsel .dn{ font-size:10.5px; color:var(--mute); font-weight:400; font-variant-numeric:tabular-nums; }
+.dsel.cur .dl::after, .dsel.cur .ds::after{ content:""; display:inline-block; width:5px; height:5px; border-radius:50%; background:var(--mark); margin-left:4px; vertical-align:2px; }
+.dsel .ds{ display:none; }
+.tab{ flex:none; position:relative; border:0; border-left:1px solid var(--rule); background:transparent; color:var(--ink-2); cursor:pointer; padding:6px 16px 8px; font-size:14px; font-weight:600; display:flex; align-items:center; gap:7px; margin-top:4px; }
+/* groupes par domaine spectral : un trait plein entre les groupes, pointillé à l'intérieur, le nom du groupe au-dessus de son premier onglet */
+.tab small{ font-size:11.5px; font-weight:400; color:var(--mute); font-variant-numeric:tabular-nums; }
+.tab:hover{ background:var(--sheet); color:var(--ink); }
+.tab[aria-selected="true"]{ background:var(--mark); color:var(--on-mark); }
+.tab[aria-selected="true"] small{ color:var(--on-mark); opacity:.75; }
+
+/* ---------- vue 3D ---------- */
+#main{ flex:1; display:flex; min-height:0; position:relative; }
+#stage{ flex:1; position:relative; min-width:0; min-height:0; background:var(--black); color:#fff; }
+#stage canvas{ position:absolute; inset:0; width:100%; height:100%; display:block; touch-action:none; cursor:grab; }
+#stage canvas.dragging{ cursor:grabbing; }
+#stage canvas.over-part{ cursor:pointer; }
+
+.hud{ position:absolute; pointer-events:none; }
+#hud-title{ left:var(--gl); top:16px; right:var(--gr); }
+#t-name{ font-weight:800; font-stretch:75%; font-size:clamp(24px, 3.4vw, 40px); line-height:1; text-shadow:0 2px 14px #000; }
+#t-sub{ color:#C9CED2; font-size:13px; margin-top:7px; text-shadow:0 1px 8px #000; }
+#t-src{ color:#8E979D; font-size:11.5px; margin-top:3px; text-shadow:0 1px 8px #000; }
+
+#hover-tip{ position:absolute; pointer-events:none; padding:3px 8px; background:#fff; color:#14171A; font-size:12px; font-weight:600; max-width:260px; transform:translate(12px, 14px); z-index:3; }
+#dep{ position:absolute; left:50%; bottom:calc(66px + env(safe-area-inset-bottom, 0px)); transform:translateX(-50%); width:min(560px, calc(100% - 24px)); background:var(--paper); color:var(--ink); padding:10px 14px 8px; z-index:3; border-top:3px solid var(--mark); }
+#dep-date{ font-size:12px; color:var(--ink-2); font-variant-numeric:tabular-nums; }
+#dep-title{ font-size:15px; }
+#dep-text{ margin:4px 0 8px; font-size:13px; line-height:1.4; color:var(--ink-2); min-height:2.8em; }
+#dep-range{ flex:1; min-width:0; accent-color:var(--ink); }
+.dep-b{ height:30px; min-width:30px; padding:0 10px; border:1px solid var(--rule-2); background:transparent; color:var(--ink); font:600 14px var(--f); cursor:pointer; }
+.dep-b:hover{ background:var(--sheet); }
+.explode[hidden]{ display:none; }
+#cut-note{ position:absolute; right:12px; top:12px; max-width:min(420px, calc(100% - 24px)); margin:0; padding:6px 10px; background:var(--paper); color:var(--ink); font-size:12px; line-height:1.4; border-left:3px solid var(--mark); z-index:2; pointer-events:none; }
+#callout{ position:absolute; pointer-events:none; transform:translate(-50%, -150%); padding:3px 9px; background:var(--mark); color:var(--on-mark); font-size:12.5px; font-weight:700; white-space:nowrap; z-index:2; }
+#callout::after{ content:""; position:absolute; left:50%; top:100%; width:2px; height:12px; margin-left:-1px; background:var(--mark); }
+#hint{ position:absolute; left:50%; bottom:calc(66px + env(safe-area-inset-bottom, 0px)); transform:translateX(-50%); font-size:12px; color:#AEB5BA; pointer-events:none; text-shadow:0 1px 6px #000; white-space:nowrap; transition:opacity .6s; max-width:92%; overflow:hidden; text-overflow:ellipsis; }
+#hint.gone{ opacity:0; }
+
+#toolbar{ position:absolute; left:50%; bottom:calc(14px + env(safe-area-inset-bottom, 0px)); transform:translateX(-50%); display:flex; align-items:stretch; background:var(--paper); color:var(--ink); max-width:calc(100% - 24px); }
+.tool{ display:flex; align-items:center; gap:7px; height:38px; padding:0 13px; border:0; border-left:1px solid var(--rule); background:transparent; color:var(--ink); font-size:13px; font-weight:600; cursor:pointer; white-space:nowrap; }
+.tool svg{ width:16px; height:16px; flex:none; }
+.tool:hover{ background:var(--sheet); }
+.tool[aria-pressed="true"]{ background:var(--mark); color:var(--on-mark); }
+.tool:disabled{ opacity:.35; cursor:default; }
+.explode{ display:flex; align-items:center; gap:9px; padding:0 13px; height:38px; color:var(--ink); font-size:13px; font-weight:600; }
+.explode svg{ width:16px; height:16px; }
+.explode input{ width:120px; accent-color:var(--ink); }
+.explode input:disabled{ opacity:.5; }
+
+#loader{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; background:rgba(0,0,0,.78); z-index:4; text-align:center; padding:0 24px; }
+#loader .bar{ width:min(280px, 70%); height:4px; background:#33393E; overflow:hidden; }
+#loader .bar i{ display:block; height:100%; width:0%; background:var(--mark); transition:width .15s linear; }
+#loader button{ border:0; background:var(--mark); color:var(--on-mark); padding:8px 16px; cursor:pointer; font-size:13px; font-weight:700; }
+
+#cmp-labels{ position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+
+/* ---------- fiche ---------- */
+#panel{ width:400px; flex:none; display:flex; flex-direction:column; min-height:0; background:var(--paper); }
+#ptabs{ flex:none; display:flex; border-top:1px solid var(--rule); border-bottom:1px solid var(--rule-2); }
+.ptab{ flex:1; padding:11px 8px 10px; background:transparent; border:0; border-right:1px solid var(--rule); color:var(--ink-2); cursor:pointer; font-size:13px; font-weight:600; white-space:nowrap; }
+.ptl{ display:contents; }
+.ptab:last-child{ border-right:0; }
+.ptl:not(:last-child) .ptab:last-child{ border-right:1px solid var(--rule); }
+.ptab:hover{ background:var(--sheet); }
+.ptab[aria-selected="true"]{ background:var(--mark); color:var(--on-mark); }
+.ptab .n{ font-weight:400; margin-left:5px; opacity:.7; font-variant-numeric:tabular-nums; }
+.ptab.go{ text-decoration:underline; text-underline-offset:3px; }
+#pbody{ flex:1; overflow-y:auto; padding:20px 22px calc(28px + env(safe-area-inset-bottom, 0px)); padding-right:max(22px, env(safe-area-inset-right, 0px)); -webkit-overflow-scrolling:touch; }
+#pbody h2{ font-weight:800; font-stretch:75%; font-size:26px; line-height:1.05; margin:0; text-wrap:balance; }
+.launch{ color:var(--mute); font-size:12.5px; margin-top:6px; line-height:1.5; }
+.facts{ display:grid; grid-template-columns:1fr 1fr; margin-top:16px; border-top:2px solid var(--ink); border-left:1px solid var(--rule); }
+.facts div{ padding:8px 10px 9px; border-right:1px solid var(--rule); border-bottom:1px solid var(--rule); min-width:0; }
+.facts dt{ font-size:11.5px; color:var(--mute); }
+.facts dd{ margin:2px 0 0; font-weight:700; font-stretch:75%; font-size:19px; line-height:1.15; font-variant-numeric:tabular-nums; }
+.facts dd small{ font-size:12px; font-weight:500; font-stretch:100%; color:var(--ink-2); }
+.desc{ font-size:14px; line-height:1.6; color:var(--ink); margin:16px 0 0; }
+.where{ margin-top:16px; background:var(--sheet); border:1px solid var(--rule); padding:10px 10px 6px; }
+.where svg{ width:100%; height:auto; display:block; }
+.spec-section{ margin-top:24px; }
+.spec-section-title{ font-weight:800; font-stretch:75%; font-size:16px; padding-bottom:5px; border-bottom:2px solid var(--ink); }
+.spec-row{ display:flex; justify-content:space-between; gap:16px; padding:7px 0; border-bottom:1px solid var(--rule); font-size:13px; }
+.spec-row .k{ color:var(--ink-2); flex:0 0 auto; max-width:44%; }
+.spec-row .v{ text-align:right; font-weight:600; min-width:0; line-height:1.4; font-variant-numeric:tabular-nums; }
+.source-note{ font-size:12px; line-height:1.55; color:var(--mute); margin-top:20px; }
+.cta{ display:block; width:100%; margin-top:16px; padding:11px 14px; text-align:left; border:2px solid var(--ink); background:var(--sheet); color:var(--ink); font-weight:700; font-size:14px; cursor:pointer; }
+.cta:hover{ background:var(--mark); color:var(--on-mark); }
+.cta:hover small{ color:var(--on-mark); }
+.cta small{ display:block; font-size:12px; color:var(--ink-2); margin-top:3px; font-weight:400; line-height:1.4; }
+.part{ border-bottom:1px solid var(--rule); }
+.part:first-of-type{ border-top:2px solid var(--ink); }
+.part > button{ display:flex; width:100%; align-items:center; gap:10px; text-align:left; padding:10px 8px; background:transparent; border:0; cursor:pointer; font-size:14px; font-weight:600; }
+.part > button:hover{ background:var(--sheet); }
+.part .dot{ width:9px; height:9px; border:1.5px solid var(--ink); flex:none; }
+.part.on > button{ background:var(--mark); color:var(--on-mark); }
+.part.on .dot{ background:var(--on-mark); border-color:var(--on-mark); }
+.part .pd{ display:none; padding:10px 8px 14px 27px; font-size:13.5px; line-height:1.6; }
+.part.on .pd{ display:block; }
+.part .pf{ margin-top:10px; padding-top:8px; border-top:1px solid var(--rule); font-size:12.5px; line-height:1.7; font-weight:600; font-variant-numeric:tabular-nums; }
+.barcell{ display:flex; align-items:center; gap:8px; white-space:nowrap; }
+.barcell i{ display:block; height:8px; background:var(--ink); min-width:2px; }
+.barcell i.alt{ background:var(--rule-2); }
+
+#err-banner{ position:fixed; left:50%; top:calc(12px + env(safe-area-inset-top, 0px)); transform:translateX(-50%); background:var(--bad); color:var(--on-bad); font-size:12.5px; padding:9px 13px; z-index:999; max-width:88vw; }
+
+@media (max-width: 860px){
+  #top{ flex-direction:column; gap:0; padding:0; }
+  .brand{ padding:9px var(--gr) 8px var(--gl); }
+  .brand h1{ font-size:18px; min-width:0; overflow:hidden; text-overflow:ellipsis; }   /* un titre long ne passe jamais sous les boutons de langue et de thème */
+  #tabs{ margin-left:0; border-top:1px solid var(--rule); }
+  .drow{ justify-content:flex-start; padding:4px var(--gr) 0 var(--gl); gap:0; }
+  .dsel{ padding:3px 7px 4px; font-size:12px; }
+  .dsel:first-child{ padding-left:0; }
+  .dsel .dl{ display:none; } .dsel .ds{ display:inline; }
+  .dsel .dn{ display:none; }
+  .trow{ justify-content:flex-start; border-top:1px solid var(--rule); }
+  .tab{ padding:9px 13px; font-size:13.5px; margin-top:0; }
+  #tabs .tab{ flex:1 1 auto; padding:9px 6px; justify-content:center; }   /* quatre observatoires et « Comparer » tiennent sur 400 px */
+  .tab:first-child{ border-left:0; }
+  .tab small{ display:none; }
+  .tab.util{ padding:0 8px; }
+  #utils{ position:absolute; top:0; right:var(--gr); height:40px; margin:0; }
+  #main{ flex-direction:column; }
+  #stage{ flex:0 0 46%; }
+  #panel{ width:auto; flex:1; }
+  #pbody{ padding-left:var(--gl); padding-right:var(--gr); }
+  #hud-title{ top:10px; }
+  #t-src, #hint{ display:none; }
+  .tool span.lbl, .explode .lbl{ display:none; }
+  .tool{ padding:0 11px; }
+  .explode input{ width:84px; }
+  #toolbar{ bottom:8px; }
+}
+@media (prefers-reduced-motion: reduce){ *{ transition-duration:.001ms !important; animation-duration:.001ms !important; } }
+
+/* réglages (langue, thème) : icônes discrètes, séparées des onglets d'observatoires */
+.tab.util{ border-left:0; align-items:center; padding:0 9px; color:var(--mute); gap:4px; }
+.tab.util:hover{ background:transparent; color:var(--ink); }
+#utils{ display:flex; flex:none; margin-left:14px; }
+#top{ position:relative; border-bottom:2px solid var(--ink); }   /* trait sous l'en-tête, le même sur toutes les vues */
+.tab.util svg{ width:18px; height:18px; display:block; }
+.tab.util span{ font-size:11.5px; font-weight:700; letter-spacing:.4px; }
+
+/* appels de source et liste des sources */
+sup.ref{ font-size:10px; font-weight:600; color:var(--mute); margin-left:3px; vertical-align:super; line-height:0; }
+sup.ref.nv{ color:var(--warn); cursor:help; }
+ol.refs{ margin:8px 0 0; padding-left:20px; font-size:12px; line-height:1.5; color:var(--ink-2); }
+ol.refs li{ margin-bottom:6px; overflow-wrap:anywhere; }
+ol.refs a{ color:var(--ink); text-underline-offset:2px; }
+ol.refs span{ color:var(--mute); }
+
+/* ---------- glossaire (lot C1) ---------- */
+abbr.gl{ text-decoration:underline dotted; text-decoration-color:var(--mute); text-underline-offset:3px; text-decoration-thickness:1px; cursor:help; border-radius:2px; }
+abbr.gl:hover, abbr.gl:focus-visible{ text-decoration-color:var(--ink); background:color-mix(in srgb, var(--mark) 35%, transparent); outline:none; }
+#gloss-tip{ position:fixed; z-index:60; padding:10px 12px; background:var(--sheet); color:var(--ink); border:1px solid var(--ink); box-shadow:3px 3px 0 var(--mark); font-size:13px; line-height:1.5; pointer-events:none; }
+#gloss-tip b{ display:block; font-weight:700; margin-bottom:3px; }
+
+/* accessibilité : texte lu par les lecteurs d'écran, invisible à l'écran ; focus de la vue 3D */
+.sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0; }
+#stage canvas:focus-visible{ outline:2px solid var(--mark); outline-offset:-4px; }
+
+/* sources sous les faits d'une pièce */
+ol.refs.pref{ margin:8px 0 0; padding-left:18px; font-size:11.5px; line-height:1.45; color:var(--ink-2); }
+ol.refs.pref li{ margin:0 0 2px; }
+
+/* onglet Mission */
+.ms-tl{ list-style:none; margin:0; padding:0; }
+.ms-tl li{ display:grid; grid-template-columns:7.4em 1fr; gap:10px; padding:9px 0; border-bottom:1px solid var(--rule); }
+.ms-tl li:last-child{ border-bottom:0; }
+.ms-d{ font-size:12px; color:var(--ink-2); font-variant-numeric:tabular-nums; line-height:1.35; }
+.ms-d small{ display:block; color:var(--warn); font-size:11px; margin-top:2px; }
+.ms-tl strong, .ms-chain strong{ font-size:13.5px; }
+.ms-tl p, .ms-chain p{ margin:3px 0 0; font-size:13px; line-height:1.45; color:var(--ink-2); }
+.ms-intro{ font-size:13px; line-height:1.5; color:var(--ink-2); margin:8px 0 10px; }
+.ms-chain{ list-style:none; margin:0; padding:0; counter-reset:ms; }
+.ms-chain li{ position:relative; display:grid; grid-template-columns:6.6em 1fr; gap:10px; padding:0 0 14px; }
+.ms-chain li::before{ content:""; position:absolute; left:3.3em; top:24px; bottom:0; width:2px; background:var(--rule-2); }
+.ms-chain li:last-child::before{ display:none; }
+.ms-lv{ position:relative; z-index:1; align-self:start; text-align:center; padding:3px 4px; background:var(--mark); color:var(--on-mark); font-family:var(--f-code); font-size:11px; font-weight:600; line-height:1.3; word-break:break-word; }
+.ms-st code{ display:inline-block; margin-top:5px; font-family:var(--f-code); font-size:11.5px; color:var(--ink); background:var(--sheet); border:1px solid var(--rule); padding:1px 6px; }
+
+/* vues d'ensemble (Comparer, Flotte) : boutons à part des onglets d'observatoires */
+#views{ display:flex; flex:none; align-items:center; gap:6px; margin-left:14px; }
+.vbtn{ border:1.5px solid var(--ink); background:transparent; color:var(--ink); font:inherit; font-size:13.5px; font-weight:700; padding:6px 12px; cursor:pointer; }
+.vbtn:hover{ background:var(--sheet); }
+.vbtn[aria-pressed="true"]{ background:var(--mark); border-color:var(--mark); color:var(--on-mark); }
+@media (max-width: 860px){
+  #views{ order:1; margin:0; gap:6px; padding:6px var(--gr) 6px var(--gl); border-top:1px solid var(--rule); }   /* téléphone : les vues d'abord, puis le choix de l'engin (comme Observatories) */
+  #tabs{ order:2; }
+  #views .views{ width:100%; }
+  .vbtn{ flex:1 1 0; text-align:center; padding:5px 4px; font-size:12.5px; }
+}
+#tabs:empty{ border:0; }
+
+/* Styles propres au site des lanceurs (repris d'EarthObservers, src/site.css) ; le reste vient du socle (socle/page/style.css). */
+#page{ flex:1; min-height:0; overflow-y:auto; background:var(--paper); padding:24px var(--gr) 48px var(--gl); }
+#page:focus{ outline:none; }
+.sk{ max-width:760px; }
+.sk h2{ font-weight:800; font-stretch:75%; font-size:clamp(26px, 4vw, 38px); line-height:1.05; margin:8px 0 12px; }
+.sk h3{ font-size:15px; margin:24px 0 6px; }
+.sk .lead{ font-size:16px; line-height:1.5; color:var(--ink-2); margin:0 0 14px; }
+.sk-state{ display:inline-block; font-size:12.5px; font-weight:700; color:var(--ink); border-left:4px solid var(--mark); padding:3px 9px; background:var(--sheet); margin:0; }
+.sk-table{ border-collapse:collapse; width:100%; font-size:13.5px; }
+.sk-table th, .sk-table td{ text-align:left; vertical-align:top; padding:6px 8px 6px 0; border-bottom:1px solid var(--rule); }
+.sk-table th{ font-weight:600; color:var(--ink-2); width:38%; }
+.src{ font-size:11.5px; color:var(--ink-2); }
+.home-link{ color:inherit; text-decoration:none; }
+/* onglets des sondes (comme les onglets d'observatoires) : le titre ne se laisse pas recouvrir ; sur écran moyen, l'année disparaît */
+@media (min-width: 861px){ .brand{ flex:none; } }
+#tabs .tab{ white-space:nowrap; }
+@media (max-width: 860px){ .brand{ padding-right:92px; } .brand h1{ font-size:16px; } #tabs, #tabs .trow{ max-width:100vw; } #tabs .tab{ padding-left:7px; padding-right:7px; font-size:13px; } }
+/* écran moyen : les onglets des sondes passent sur une seconde rangée de l'en-tête, pleine largeur (sinon certains sortent du cadre) */
+@media (min-width: 861px) and (max-width: 1500px){
+  #top{ flex-wrap:wrap; row-gap:0; }
+  #views{ margin-left:auto; }
+  .brand, #views, #utils{ min-height:55px; }   /* première rangée de hauteur fixe : les boutons de vue ne bougent pas quand les onglets apparaissent (règle 6) */
+  #tabs{ order:5; flex:0 0 calc(100% + var(--gl) + var(--gr)); margin:0 calc(-1 * var(--gr)) 0 calc(-1 * var(--gl)); border-top:1px solid var(--rule); padding-left:var(--gl); }
+  #tabs .trow, #tabs .drow{ justify-content:flex-start; }
+  #tabs .drow{ padding-top:4px; }
+  #tabs .tab{ margin-top:0; padding-top:7px; padding-bottom:7px; }
+  #tabs .tab:first-child{ border-left:0; }
+}
+
+/* ---------- page d'une mission : vue 3D + panneau ---------- */
+#page.is-mission{ padding:0; overflow:hidden; display:flex; }
+.mission{ flex:1; display:flex; min-height:0; min-width:0; }
+#stage.m-stage{ flex:1; position:relative; min-width:0; min-height:420px; background:var(--black); color:#fff; overflow:hidden; }
+.m-stage canvas{ position:absolute; inset:0; width:100%; height:100%; display:block; touch-action:none; cursor:grab; }
+.m-stage canvas.dragging{ cursor:grabbing; } .m-stage canvas.over-part{ cursor:pointer; }
+.m-hud{ position:absolute; left:var(--gl); top:16px; right:var(--gr); pointer-events:none; }
+.m-name{ font-weight:800; font-stretch:75%; font-size:clamp(24px, 3.4vw, 40px); line-height:1; text-shadow:0 2px 14px #000; }
+.m-sub{ color:#C9CED2; font-size:13px; margin-top:7px; text-shadow:0 1px 8px #000; }
+.m-body-note{ margin:5px 0 0; font-size:12px; color:#AEB5BA; text-shadow:0 1px 8px #000; max-width:520px; }
+.m-msg{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); margin:0; background:#14171A; color:#fff; padding:8px 12px; font-size:13px; max-width:80%; }
+.m-tools{ position:absolute; left:0; right:0; margin:0 auto; width:max-content; bottom:calc(14px + env(safe-area-inset-bottom, 0px)); display:flex; align-items:stretch; background:var(--paper); color:var(--ink); max-width:calc(100% - 24px); }
+.m-ex{ display:flex; align-items:center; gap:9px; padding:0 13px; height:38px; font-size:13px; font-weight:600; color:var(--ink); }
+.m-ex input{ width:120px; accent-color:var(--ink); }
+.m-tools svg{ width:16px; height:16px; flex:none; }
+.m-b{ display:flex; align-items:center; gap:7px; height:38px; padding:0 13px; border:0; border-left:1px solid var(--rule); background:transparent; color:var(--ink); font:600 13px var(--f); cursor:pointer; white-space:nowrap; }
+.m-b:hover{ background:var(--sheet); }
+.m-b[aria-pressed="true"]{ background:var(--mark); color:var(--on-mark); }
+.m-b:first-child{ border-left:0; }
+.m-b:focus-visible, .m-ex input:focus-visible{ outline:2px solid #fff; outline-offset:3px; }
+.m-hint{ position:absolute; left:0; right:0; margin:0 auto !important; width:max-content; bottom:calc(66px + env(safe-area-inset-bottom, 0px)); white-space:nowrap; max-width:92%; overflow:hidden; text-overflow:ellipsis; pointer-events:none; margin:0; font-size:12px; color:#E3E6E8; background:rgba(0,0,0,.72); padding:2px 8px; }
+.m-panel{ width:min(400px, 42vw); flex:none; overflow-y:auto; background:var(--sheet); padding:14px 18px 32px; border-left:1px solid var(--rule); }
+.m-panel .ptl-row{ display:flex; align-items:stretch; gap:4px; border-bottom:1px solid var(--rule); margin-bottom:12px; }
+.m-panel .ptl{ display:flex; gap:4px; }
+.m-panel .ptab small{ font-weight:400; opacity:.75; margin-left:3px; }
+.m-panel .ptab.go{ margin-left:auto; color:var(--ink); text-decoration:underline; text-underline-offset:3px; display:flex; align-items:center; }
+.m-panel .ptab{ border:0; border-bottom:3px solid transparent; background:transparent; font:600 14px var(--f); color:var(--ink-2); padding:6px 10px; cursor:pointer; }
+.m-panel .ptab[aria-selected="true"]{ color:var(--ink); border-bottom-color:var(--ink); }
+.m-panel .desc{ font-size:14px; line-height:1.5; color:var(--ink-2); }
+.m-panel h3{ font-size:13px; text-transform:uppercase; letter-spacing:.4px; margin:18px 0 4px; }
+.m-panel .cta{ display:block; width:100%; text-align:left; margin-top:20px; border:1.5px solid var(--ink); background:transparent; color:var(--ink); font:700 14px var(--f); padding:10px 12px; cursor:pointer; }
+.m-panel .cta small{ display:block; font-weight:400; color:var(--ink-2); margin-top:3px; }
+.parts{ list-style:none; margin:0; padding:0; }
+.part > button{ width:100%; text-align:left; border:0; border-bottom:1px solid var(--rule); background:transparent; font:600 14px var(--f); color:var(--ink); padding:9px 2px; cursor:pointer; }
+.part.on > button{ background:var(--mark); color:var(--on-mark); padding-left:8px; }
+.part-body{ font-size:13.5px; line-height:1.45; color:var(--ink-2); padding:4px 2px 10px; }
+.note{ font-size:12px; color:var(--ink-2); margin-top:14px; }
+.sk.wide{ max-width:960px; }
+.sk.full{ max-width:none; }
+figure{ margin:0 0 10px; } figcaption{ font-size:12.5px; line-height:1.45; color:var(--ink-2); margin-top:6px; }
+@media (max-width: 720px){
+  #page.is-mission{ overflow-y:auto; display:block; }
+  .mission{ flex-direction:column; }
+  #stage.m-stage{ flex:none; height:46vh; min-height:300px; }
+  .m-hint{ display:none; }
+  .m-tools .lbl{ display:none; }
+  .m-b{ padding:0 11px; } .m-ex input{ width:84px; }
+  .m-tools{ bottom:8px; }
+  .m-hud{ top:10px; }
+  /* téléphone : onglets du panneau en cases pleine largeur, comme Observatories */
+  .m-panel{ padding-top:0; }
+  .m-panel .ptl-row{ gap:0; margin:0 -18px 12px; border-top:1px solid var(--rule); border-bottom:1px solid var(--rule-2); }
+  .m-panel .ptl{ gap:0; flex:2; }
+  .m-panel .ptab{ flex:1; border-bottom:0; border-right:1px solid var(--rule); padding:11px 8px 10px; font-size:13px; text-align:center; justify-content:center; }
+  .m-panel .ptab[aria-selected="true"]{ background:var(--mark); color:var(--on-mark); }
+  .m-panel .ptab.go{ flex:1.4; margin-left:0; border-right:0; }
+  .m-panel{ width:auto; border-left:0; }
+}
+
+/* barre de séparation entre l'en-tête et le contenu, comme la rangée du haut des pages Flotte et Comparer d'Observatories */
+#top{ border-bottom:2px solid var(--ink); }
+
+/* ---------- Comparer : silhouettes à l'échelle (src/views.js) ---------- */
+.cmp-fig{ background:var(--black); padding:8px 0 0; overflow-x:auto; }
+.cmp-fig svg{ display:block; height:auto; min-width:640px; width:100%; font-family:var(--f); }
+.cmp-fig .gl{ stroke:#3A4046; stroke-width:1; }
+.cmp-fig .gt{ fill:#AEB5BA; font-size:11px; }
+.cmp-fig .nm{ fill:#fff; font-size:12.5px; font-weight:700; }
+.cmp-fig .hm{ fill:#AEB5BA; font-size:11px; }
+.cmp-fig a:focus-visible .bx{ stroke:#fff; stroke-width:2; }
+.cmp-fig .bx{ fill:transparent; stroke:none; }
+.cmp-fig a:hover .bx{ stroke:#fff; stroke-width:1; }
+.sil-core{ fill:#E8E4DA; } .sil-up{ fill:#C9C4B8; } .sil-bst{ fill:var(--mark); } .sil-fair{ fill:#F4F1EA; } .sil-cap{ fill:#9AA3AA; }
+.cmp-tab td.num, .cmp-tab th.num{ text-align:right; font-variant-numeric:tabular-nums; }
+.cmp-tab th{ width:auto; }
+.cmp-tab{ margin-top:8px; }
+.cmp-tab td small{ color:var(--ink-2); display:block; font-size:11.5px; }
+/* ---------- Flotte : frise ---------- */
+.fl-fig svg{ display:block; width:100%; height:auto; font-family:var(--f); }
+.fl-bar{ fill:var(--ink); } .fl-bar.off{ fill:var(--rule-2, #9AA3AA); } .fl-bar.dev{ fill:none; stroke:var(--ink); stroke-width:1.5; stroke-dasharray:4 3; }
+.fl-mark{ fill:var(--mark); }
+.fl-fig a:focus-visible text{ text-decoration:underline; }
+.fl-fig .fl-lab{ font-size:13px; font-weight:700; fill:var(--ink); }
+.fl-fig .fl-sub{ font-size:11.5px; fill:var(--ink-2); }
+.fl-grid{ stroke:var(--rule); stroke-width:1; }
+.fl-year{ font-size:11px; fill:var(--ink-2); }
+.cmp-tab a, .sk-table th a{ color:var(--ink); }
+#tabs .tab[aria-selected="true"] small{ opacity:1; }
+.views{ display:flex; gap:6px; }   /* comme socle/page/inst.css, que ce site ne charge pas */
+
+</style>
+</head>
+<body>
+<div id="app">
+  <header id="top">
+    <div class="brand">
+      <a href="https://rolgim.github.io/" class="hub-link" tabindex="-1" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M3 11.5 12 4l9 7.5M5.5 9.5V20h5v-6h3v6h5V9.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/></svg></a>
+      <h1><a href="https://rolgim.github.io/" class="home-link" title="Page d'accueil des sites">Lanceurs</a></h1>
+    </div>
+    <nav id="tabs" aria-label="Lanceur"></nav>
+    <nav id="views" aria-label="Vues d'ensemble"></nav>
+    <div id="utils"></div>
+  </header>
+
+  <main id="page" tabindex="-1"></main>
+  <div id="live" class="sr-only" aria-live="polite"></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script>
+/* Langue du site : français ou anglais.
+   Ordre de décision : préfixe du lien (#en-mro, #fr-mro), puis choix mémorisé, sinon anglais.
+   Les textes français sont dans les sources ; les textes anglais sont dans src/en/ et appliqués par src/i18n.js. */
+var OBS_LANG = (function(){
+  var m = /^#(en|fr)-/.exec(location.hash || ''), v = m && m[1];
+  if (!v) try { v = localStorage.getItem('ln-lang'); } catch(e){}
+  if (v !== 'en' && v !== 'fr') v = 'en';   /* anglais par défaut ; le français se choisit par le bouton FR ou un lien #fr-… */
+  try { document.documentElement.lang = v; } catch(e){}
+  return v;
+})();
+/* nombres : virgule décimale et espace des milliers en français, point et virgule en anglais */
+function OBS_NUM(s){ return OBS_LANG === 'en' ? String(s).replace(/(\d),(?!\d{3}(?:\D|$))(\d)/g, '$1.$2').replace(/(\d)[   ](?=\d{3}(\D|$))/g, '$1,') : s; }
+
+/* =================================================================
+   LANCEURS — registre (le nom MISSIONS est gardé pour réutiliser le code du socle : i18n.js, viewer.js, outils de test).
+   Ajouter un lanceur = une entrée ici et ses textes anglais dans en/launchers.js ; app.js et views.js n'ont pas à changer.
+   build.js et tools/pages.js lisent ce registre (une ligne « id:'…' » par lanceur, indentée de 4 espaces).
+     id, name, short, year      identifiant (ancre #id), nom complet, nom court, année du premier vol
+     agency                     constructeur et opérateur, en texte
+     first, firstRef            date du premier vol (AAAA-MM-JJ) et sa source ; last, lastRef : dernier vol d'un lanceur retiré
+     dims                       { h, d, mass } : hauteur (m), diamètre du corps central (m), masse au décollage (t) ;
+                                chacun { v, ref, approx } (approx : valeur approchée, affichée avec « ≈ »)
+     cap                        capacités : [{ o:'LEO'|'GTO'|'TLI', t (tonnes), note (orbite de référence), ref, approx }]
+     sil                        silhouette de « Comparer » (schéma) : { body:[{ d, h, k, nose }] du bas vers le haut, bst:{ n, d, h, nose } }
+     file, bytes, unit          maquette (models/<id>.glb, préparée par tools/models/prep.mjs), null s'il n'y en a pas ; unit : mètres par unité
+     model                      { src, license, u, note } : provenance et licence de la maquette, écrites à côté d'elle
+     view, sun                  cadrage initial { az, el, dist } ; direction de la lumière dans le repère de la maquette
+     parts                      étages et éléments cliquables : { key (nom du nœud dans la maquette), name, desc, facts:[[texte, clé de source]] }
+     refs                       sources : { clé:{ t:titre, p:éditeur, u:URL } } ; chaque valeur chiffrée cite une clé
+     sections                   fiche : [{ title, rows:[[libellé, valeur, clé de source]] }] ; « ≈ » pour l'approximatif
+     desc, checked              description courte ; date de la dernière vérification des valeurs
+================================================================= */
+var MISSIONS = [
+  {
+    id:'ariane5', name:'Ariane 5 ECA', short:'Ariane 5', year:'1996',
+    agency:'ESA, ArianeGroup ; exploité par Arianespace',
+    first:'1996-06-04', firstRef:'csg', last:'2023-07-05', lastRef:'csg',
+    dims:{ h:{ v:53, ref:'esa' }, d:{ v:5.4, ref:'esa' }, mass:{ v:780, ref:'esa' } },
+    cap:[ { o:'GTO', t:10, note:'lancement double', ref:'esa' }, { o:'LEO', t:21, ref:'csg' } ],
+    sil:{ body:[ { d:5.4, h:30.5, k:'core' }, { d:5.4, h:5.5, k:'up' }, { d:5.4, h:17, k:'fair', nose:7 } ], bst:{ n:2, d:3.05, h:31.6, nose:4 } },
+    file:'models/ariane5.glb', bytes:3140928, unit:5.43,
+    model:{ src:'« Ariane 5 model », Yanis / notbadworks (Sketchfab)', license:'CC BY 4.0', u:'https://sketchfab.com/3d-models/ariane-5-model-88a1de562245402da653bc1ae92b1b91', note:'Maquette regroupée par étage d\'après la position de chaque pièce, et allégée pour ce site. Mise à l\'échelle : 53 m de haut.' },
+    view:{ az:0.6, el:0.12, dist:2.1 }, sun:[0.6, 0.5, 0.6],
+    desc:'Le lanceur lourd européen de 1996 à 2023 : 117 vols depuis Kourou, dont le télescope James Webb en 2021 et la sonde JUICE en 2023. Sa version ECA, la plus puissante, pouvait placer deux satellites de télécommunications à la fois en orbite de transfert géostationnaire.',
+    checked:'2026-11-26',
+    refs:{
+      esa:{ t:'Ariane 5 ECA (page publiée le 5 mars 2004)', p:'ESA', u:'https://esa.int/Enabling_Support/Space_Transportation/Launch_vehicles/Ariane_5_ECA' },
+      csg:{ t:'Ariane 5, the legend', p:'CNES, Centre spatial guyanais', u:'https://centrespatialguyanais.cnes.fr/en/ariane-5' }
+    },
+    parts:[
+      { key:'eap', name:'Propulseurs d\'appoint EAP', desc:'Deux propulseurs à poudre fixés de part et d\'autre de l\'étage principal ; ils fournissent l\'essentiel de la poussée au décollage, puis se détachent.',
+        facts:[['Poussée des deux propulseurs au décollage : 1 300 tonnes', 'esa']] },
+      { key:'epc', name:'Étage principal EPC (moteur Vulcain 2)', desc:'Étage cryogénique allumé au sol, quelques secondes avant les propulseurs, et qui fonctionne près de neuf minutes.',
+        facts:[['Ergols : 150 t d\'oxygène liquide et 25 t d\'hydrogène liquide', 'esa'], ['Poussée du Vulcain 2 : jusqu\'à 137 tonnes', 'esa'], ['Durée de fonctionnement : près de 540 s', 'esa']] },
+      { key:'esc', name:'Étage supérieur ESC-A (moteur HM7B)', desc:'Étage cryogénique qui achève la mise en orbite.',
+        facts:[['Ergols : 14,7 t', 'esa'], ['Poussée du HM7B dans le vide : 6,5 tonnes', 'esa'], ['Durée de fonctionnement : près de 940 s', 'esa']] },
+      { key:'fairing', name:'Coiffe', desc:'Protège les satellites pendant la traversée de l\'atmosphère, puis s\'ouvre en deux. Pour un lancement double, une structure (Sylda) sépare les deux satellites sous la coiffe.',
+        facts:[] }
+    ],
+    sections:[
+      { title:'Lanceur', rows:[
+        ['Hauteur', 'jusqu\'à 53 m', 'esa'],
+        ['Diamètre', 'jusqu\'à 5,4 m', 'esa'],
+        ['Masse au décollage', '780 t (lancement double)', 'esa'],
+        ['Étages', 'deux propulseurs à poudre EAP, étage principal EPC, étage supérieur ESC-A', 'esa']
+      ]},
+      { title:'Carrière', rows:[
+        ['Premier vol', '4 juin 1996 (premier vol de la version ECA : 11 décembre 2002, échec)', 'csg'],
+        ['Dernier vol', '5 juillet 2023, 117e vol', 'csg'],
+        ['Fiabilité', '98,4 % au dernier vol', 'csg'],
+        ['Base de lancement', 'Centre spatial guyanais, Kourou (ensemble ELA-3)', 'csg']
+      ]},
+      { title:'Capacités', rows:[
+        ['Orbite de transfert géostationnaire', '10 t en lancement double, 10,8 t en lancement simple', 'csg'],
+        ['Orbite basse', 'jusqu\'à 21 t', 'csg']
+      ]}
+    ]
+  },
+  {
+    id:'ariane6', name:'Ariane 64', short:'Ariane 6', year:'2024',
+    agency:'ESA, ArianeGroup ; exploité par Arianespace',
+    first:'2024-07-09', firstRef:'esa1',
+    dims:{ h:{ v:62, ref:'cnes' }, d:{ v:5.4, ref:'esa' }, mass:{ v:860, ref:'cnes' } },
+    cap:[ { o:'GTO', t:11.5, approx:true, ref:'esa' }, { o:'LEO', t:21.6, ref:'esa' } ],
+    sil:{ body:[ { d:5.4, h:30, k:'core' }, { d:5.4, h:12, k:'up' }, { d:5.4, h:20, k:'fair', nose:8 } ], bst:{ n:4, d:3.4, h:13.5, nose:3 } },
+    file:'models/ariane6.glb', bytes:2719512, unit:4.9,
+    model:{ src:'« ESA Ariane 6 (64) », Clarence365 (Sketchfab)', license:'CC BY 4.0', u:'https://sketchfab.com/3d-models/esa-ariane-6-64-98a68de96a61406cb68b8f8ac89eb5ef', note:'Maquette regroupée par étage et allégée pour ce site (textures réduites). Mise à l\'échelle : 62 m de haut.' },
+    view:{ az:0.6, el:0.12, dist:2.1 }, sun:[0.6, 0.5, 0.6],
+    desc:'Successeur d\'Ariane 5, lancé pour la première fois le 9 juillet 2024 depuis Kourou. Deux versions : Ariane 62, avec deux propulseurs à poudre, et Ariane 64, avec quatre. Son étage supérieur, propulsé par le moteur Vinci, peut se rallumer pour déposer des satellites sur plusieurs orbites au cours d\'un même vol.',
+    checked:'2026-11-26',
+    refs:{
+      esa:{ t:'Ariane 6 overview', p:'ESA', u:'https://www.esa.int/Enabling_Support/Space_Transportation/Launch_vehicles/Ariane_6_overview' },
+      cnes:{ t:'Ariane 6, technical features', p:'CNES', u:'https://ariane6.cnes.fr/en/technical-features' },
+      esa1:{ t:'Europe\'s new Ariane 6 rocket powers into space (communiqué du premier vol)', p:'ESA', u:'https://www.esa.int/Newsroom/Press_Releases/Europe_s_new_Ariane_6_rocket_powers_into_space' }
+    },
+    parts:[
+      { key:'p120c', name:'Propulseurs d\'appoint P120C', desc:'Deux (Ariane 62) ou quatre (Ariane 64) propulseurs à poudre ; le même moteur sert de premier étage à Vega-C.',
+        facts:[['Poudre : 142 t par propulseur', 'cnes'], ['Poussée au décollage : 350 tonnes par propulseur', 'cnes'], ['Durée de combustion : 130 s', 'cnes']] },
+      { key:'llpm', name:'Étage principal (moteur Vulcain 2.1)', desc:'Étage cryogénique à hydrogène et oxygène liquides, qui assure les dix premières minutes du vol.',
+        facts:[['Ergols : 150 t', 'cnes'], ['Poussée du Vulcain 2.1 au décollage : 135 tonnes', 'cnes']] },
+      { key:'ulpm', name:'Étage supérieur (moteur Vinci)', desc:'Étage cryogénique réallumable : il peut s\'éteindre et se rallumer plusieurs fois pour viser des orbites différentes.',
+        facts:[['Réservoirs pleins : 30 t', 'cnes'], ['Poussée du Vinci : 18 tonnes', 'cnes']] },
+      { key:'fairing', name:'Coiffe', desc:'Protège les satellites pendant la traversée de l\'atmosphère, puis s\'ouvre en deux.',
+        facts:[['Hauteur : 14 ou 20 m', 'cnes'], ['Diamètre : 5,4 m', 'esa']] }
+    ],
+    sections:[
+      { title:'Lanceur', rows:[
+        ['Hauteur', '62 m', 'cnes'],
+        ['Diamètre', '5,4 m (coiffe)', 'esa'],
+        ['Masse au décollage', 'Ariane 62 : 530 t ; Ariane 64 : 860 t', 'cnes'],
+        ['Poussée au décollage', 'Ariane 62 : 800 tonnes ; Ariane 64 : 1 500 tonnes', 'cnes'],
+        ['Étages', 'deux ou quatre propulseurs P120C, étage principal (Vulcain 2.1), étage supérieur (Vinci)', 'esa']
+      ]},
+      { title:'Carrière', rows:[
+        ['Premier vol', '9 juillet 2024 (Ariane 62)', 'esa1'],
+        ['Base de lancement', 'Centre spatial guyanais, Kourou (nouvel ensemble à 4 km à l\'ouest de celui d\'Ariane 5)', 'esa']
+      ]},
+      { title:'Capacités', rows:[
+        ['Orbite de transfert géostationnaire', 'Ariane 62 : ≈ 4,5 t ; Ariane 64 : ≈ 11,5 t', 'esa'],
+        ['Orbite basse', 'Ariane 62 : 10,3 t ; Ariane 64 : 21,6 t', 'esa']
+      ]}
+    ]
+  },
+  {
+    id:'vegac', name:'Vega-C', short:'Vega-C', year:'2022',
+    agency:'ESA, Avio ; exploité par Avio',
+    first:'2022-07-13', firstRef:'csg',
+    dims:{ h:{ v:34.8, ref:'csg' }, d:{ v:3.4, ref:'csg' }, mass:{ v:210, ref:'csg' } },
+    cap:[ { o:'LEO', t:3.3, ref:'esa' } ],
+    sil:{ body:[ { d:3.4, h:13.5, k:'core' }, { d:2.4, h:8, k:'up' }, { d:1.9, h:4, k:'up' }, { d:3.3, h:9.3, k:'fair', nose:4 } ] },
+    file:'models/vegac.glb', bytes:2562184, unit:0.2021,
+    model:{ src:'« Vega-c », SethAlevy (Sketchfab)', license:'CC BY 4.0', u:'https://sketchfab.com/3d-models/vega-c-8b74cf8d08bc419e966d7ede30c27bf6', note:'Maquette « inspirée de Vega-C » selon son auteur (modèle de CAO personnel), pas une reproduction exacte. Regroupée par étage et allégée pour ce site. Mise à l\'échelle : 34,8 m de haut.' },
+    view:{ az:0.6, el:0.12, dist:2.1 }, sun:[0.6, 0.5, 0.6],
+    desc:'Petit lanceur européen pour les satellites d\'observation de la Terre et les missions scientifiques en orbite basse. Ses trois premiers étages sont à poudre ; le quatrième, AVUM+, à ergols liquides, peut se rallumer. Premier vol le 13 juillet 2022, retour en vol le 5 décembre 2024 après l\'échec de fin 2022.',
+    checked:'2026-11-26',
+    refs:{
+      esa:{ t:'Vega-C', p:'ESA', u:'https://www.esa.int/Enabling_Support/Space_Transportation/Launch_vehicles/Vega-C' },
+      csg:{ t:'Vega-C', p:'CNES, Centre spatial guyanais', u:'https://centrespatialguyanais.cnes.fr/en/vega-c' }
+    },
+    parts:[
+      { key:'p120c', name:'Premier étage P120C', desc:'Moteur à poudre, le même que les propulseurs d\'appoint d\'Ariane 6.',
+        facts:[['Poudre : 143,6 t', 'esa'], ['Poussée moyenne : 4 500 kN', 'esa'], ['Durée : environ deux minutes', 'csg']] },
+      { key:'z40', name:'Deuxième étage Zefiro 40', desc:'Moteur à poudre.',
+        facts:[['Poudre : 36,2 t', 'esa'], ['Poussée moyenne : 1 304 kN', 'esa']] },
+      { key:'z9', name:'Troisième étage Zefiro 9', desc:'Moteur à poudre.',
+        facts:[['Poudre : 10 t', 'esa'], ['Durée : deux minutes et demie', 'csg']] },
+      { key:'avum', name:'Étage supérieur AVUM+', desc:'Étage à ergols liquides, réallumable, qui ajuste l\'orbite et peut déposer plusieurs satellites.',
+        facts:[['Ergols : 740 kg', 'esa'], ['Poussée moyenne : 2,42 kN', 'esa']] }
+    ],
+    sections:[
+      { title:'Lanceur', rows:[
+        ['Hauteur', '34,8 m', 'csg'],
+        ['Diamètre', '3,4 m', 'csg'],
+        ['Masse au décollage', '210 t', 'csg'],
+        ['Étages', 'P120C, Zefiro 40, Zefiro 9 (poudre), AVUM+ (liquide)', 'esa']
+      ]},
+      { title:'Carrière', rows:[
+        ['Premier vol', '13 juillet 2022', 'csg'],
+        ['Retour en vol', '5 décembre 2024, après l\'échec de fin 2022', 'csg'],
+        ['Base de lancement', 'Centre spatial guyanais, Kourou', 'csg']
+      ]},
+      { title:'Capacités', rows:[
+        ['Orbite basse', '3,3 t', 'esa'],
+        ['Orbite héliosynchrone', '2,3 t', 'esa'],
+        ['Orbite polaire, 700 km', 'jusqu\'à 2,2 t', 'csg']
+      ]}
+    ]
+  },
+  {
+    id:'falcon9', name:'Falcon 9 Block 5', short:'Falcon 9', year:'2010',
+    agency:'SpaceX',
+    first:'2010-06-04', firstRef:'wp',
+    dims:{ h:{ v:70, ref:'wv' }, d:{ v:3.7, ref:'wv' }, mass:{ v:549, ref:'wv' } },
+    cap:[ { o:'LEO', t:22.8, note:'premier étage non récupéré ; 17,5 t avec retour sur barge (28,5°)', ref:'wp' }, { o:'GTO', t:8.3, note:'premier étage non récupéré ; 5,5 t avec retour sur barge', ref:'wp' } ],
+    sil:{ body:[ { d:3.7, h:42.6, k:'core' }, { d:3.7, h:14.3, k:'up' }, { d:5.2, h:13.1, k:'fair', nose:6 } ] },
+    file:'models/falcon9.glb', bytes:2896992, unit:1.057,
+    model:{ src:'« SpaceX Falcon 9 V4 », Clarence365 (Sketchfab)', license:'CC BY 4.0', u:'https://sketchfab.com/3d-models/spacex-falcon-9-v4-33e974795a21416eaac38d536ae1ceb9', note:'Maquette regroupée par étage et allégée pour ce site (textures réduites). Mise à l\'échelle : 70 m de haut.' },
+    view:{ az:0.6, el:0.12, dist:2.1 }, sun:[0.6, 0.5, 0.6],
+    desc:'Le lanceur le plus utilisé au monde aujourd\'hui. Son premier étage, propulsé par neuf moteurs Merlin, revient se poser sur une barge en mer ou près du pas de tir, puis revole : c\'est le premier lanceur orbital dont le premier étage est réutilisé couramment. Il lance les satellites Starlink, des missions scientifiques et, avec la capsule Dragon, des équipages vers la Station spatiale internationale.',
+    checked:'2026-11-26',
+    refs:{
+      wv:{ t:'Falcon 9 v1.2 or Full Thrust (Block 5), fiche technique', p:'Wevolver', u:'https://www.wevolver.com/specs/falcon-9-v12-or-full-thrust-block-5' },
+      wp:{ t:'Falcon 9 (article encyclopédique, figures de l\'infobox)', p:'Wikipédia (en)', u:'https://en.wikipedia.org/wiki/Falcon_9' }
+    },
+    parts:[
+      { key:'stage1', name:'Premier étage (neuf moteurs Merlin 1D)', desc:'Étage à kérosène et oxygène liquide, réutilisable : après la séparation, il rallume trois de ses moteurs, se guide avec ses ailerons en grille et se pose sur quatre pieds.',
+        facts:[['Hauteur : 41,2 m (47,7 m avec l\'interétage)', 'wv'], ['Poussée au sol : 7 607 kN ; dans le vide : 8 227 kN', 'wv'], ['Durée : 162 s', 'wv']] },
+      { key:'stage2', name:'Deuxième étage (moteur Merlin Vacuum)', desc:'Étage à kérosène et oxygène liquide, non récupéré ; son moteur peut se rallumer.',
+        facts:[['Hauteur : 13,8 m', 'wv'], ['Poussée dans le vide : 981 kN', 'wv'], ['Durée : 397 s', 'wv']] },
+      { key:'fairing', name:'Coiffe', desc:'Coiffe en deux moitiés, récupérées en mer et réutilisées. Pour un vol habité, la capsule Dragon remplace la coiffe.',
+        facts:[['Hauteur : 13,1 m ; diamètre : 5,2 m', 'wv']] }
+    ],
+    sections:[
+      { title:'Lanceur', rows:[
+        ['Hauteur', '70 m', 'wv'],
+        ['Diamètre', '3,7 m', 'wv'],
+        ['Masse au décollage', '549 054 kg', 'wv'],
+        ['Poussée au décollage', '7 607 kN', 'wv'],
+        ['Étages', 'deux, à kérosène et oxygène liquide ; premier étage réutilisable', 'wv']
+      ]},
+      { title:'Carrière', rows:[
+        ['Premier vol', '4 juin 2010 (version Block 5 : 11 mai 2018)', 'wp'],
+        ['Bases de lancement', 'Cap Canaveral (SLC-40), centre Kennedy (LC-39A), Vandenberg (SLC-4E)', 'wp']
+      ]},
+      { title:'Capacités', rows:[
+        ['Orbite basse (28,5°)', '22,8 t sans récupération ; 17,5 t avec retour sur barge', 'wp'],
+        ['Orbite de transfert géostationnaire', '8,3 t sans récupération ; 5,5 t avec retour sur barge', 'wp'],
+        ['Vers Mars', '4,02 t', 'wv']
+      ]}
+    ]
+  },
+  {
+    id:'falconheavy', name:'Falcon Heavy', short:'Falcon Heavy', year:'2018',
+    agency:'SpaceX',
+    first:'2018-02-06', firstRef:'wp',
+    dims:{ h:{ v:70, ref:'wp' }, d:{ v:3.7, ref:'wp' }, mass:{ v:1420, ref:'wp' } },
+    cap:[ { o:'LEO', t:63.8, note:'sans récupération (28,5°)', ref:'wp' }, { o:'GTO', t:26.7, note:'sans récupération ; 8 t si les trois corps sont récupérés', ref:'wp' } ],
+    sil:{ body:[ { d:3.7, h:42.6, k:'core' }, { d:3.7, h:14.3, k:'up' }, { d:5.2, h:13.1, k:'fair', nose:6 } ], bst:{ n:2, d:3.7, h:44, nose:4 } },
+    file:'models/falconheavy.glb', bytes:5210204, unit:1.057,
+    model:{ src:'« SpaceX Falcon Heavy V4 », Clarence365 (Sketchfab)', license:'CC BY 4.0', u:'https://sketchfab.com/3d-models/spacex-falcon-heavy-v4-a91bccdf8e624997892bab2f0fbec28f', note:'Maquette regroupée par étage et allégée pour ce site (textures réduites). Mise à l\'échelle : 70 m de haut.' },
+    view:{ az:0.6, el:0.12, dist:2.1 }, sun:[0.6, 0.5, 0.6],
+    desc:'Trois premiers étages de Falcon 9 côte à côte, 27 moteurs Merlin allumés au décollage. Les deux propulseurs latéraux reviennent souvent se poser ensemble près du pas de tir. Il a lancé la sonde Psyche, le satellite météorologique GOES-U et la sonde Europa Clipper vers Jupiter.',
+    checked:'2026-11-26',
+    refs:{
+      wp:{ t:'Falcon Heavy (article encyclopédique ; capacités d\'après SpaceX, « Capabilities & Services »)', p:'Wikipédia (en)', u:'https://en.wikipedia.org/wiki/Falcon_Heavy' }
+    },
+    parts:[
+      { key:'boosters', name:'Deux propulseurs latéraux', desc:'Deux premiers étages de Falcon 9 renforcés, avec un nez à la place de l\'étage supérieur ; ils se séparent les premiers et peuvent revenir se poser.',
+        facts:[['Neuf moteurs Merlin 1D chacun', 'wp'], ['Poussée au sol : 7 600 kN chacun', 'wp'], ['Durée : 154,3 s', 'wp']] },
+      { key:'core', name:'Corps central', desc:'Premier étage central, renforcé pour porter les deux propulseurs ; ses moteurs tournent au ralenti au début pour durer plus longtemps.',
+        facts:[['Neuf moteurs Merlin 1D', 'wp'], ['Hauteur : 42,6 m', 'wp'], ['Durée : 187 s', 'wp']] },
+      { key:'stage2', name:'Deuxième étage (moteur Merlin Vacuum)', desc:'Le même que celui de Falcon 9.',
+        facts:[['Poussée dans le vide : 934 kN', 'wp'], ['Durée : 397 s', 'wp']] },
+      { key:'fairing', name:'Coiffe', desc:'La même coiffe que Falcon 9.',
+        facts:[] }
+    ],
+    sections:[
+      { title:'Lanceur', rows:[
+        ['Hauteur', '70 m', 'wp'],
+        ['Largeur', '12,2 m (chaque corps : 3,7 m)', 'wp'],
+        ['Masse au décollage', '1 420 t', 'wp'],
+        ['Poussée au décollage', '22,82 MN (27 moteurs Merlin 1D)', 'wp'],
+        ['Étages', 'deux propulseurs latéraux et un corps central (premiers étages de Falcon 9), deuxième étage de Falcon 9', 'wp']
+      ]},
+      { title:'Carrière', rows:[
+        ['Premier vol', '6 février 2018, centre Kennedy', 'wp'],
+        ['Base de lancement', 'centre Kennedy (LC-39A)', 'wp']
+      ]},
+      { title:'Capacités', rows:[
+        ['Orbite basse (28,5°)', '63,8 t sans récupération', 'wp'],
+        ['Orbite de transfert géostationnaire', '26,7 t sans récupération ; 8 t si les trois corps sont récupérés', 'wp'],
+        ['Vers Mars', '16,8 t', 'wp']
+      ]}
+    ]
+  },
+  {
+    id:'sls', name:'SLS Block 1', short:'SLS', year:'2022',
+    agency:'NASA ; Boeing (étage central), Northrop Grumman (propulseurs)',
+    first:'2022-11-16', firstRef:'nasa',
+    dims:{ h:{ v:98.3, ref:'nasa1b' }, d:{ v:8.4, ref:'wp', approx:true }, mass:{ v:2610, ref:'wp' } },
+    cap:[ { o:'TLI', t:27, note:'plus de 27 t vers la Lune (Orion comprise)', ref:'nasa1b' }, { o:'LEO', t:95, note:'200 km, 28,5°', ref:'wp' } ],
+    sil:{ body:[ { d:8.4, h:64.6, k:'core' }, { d:5, h:13.4, k:'up' }, { d:5, h:6, k:'cap' }, { d:1.6, h:14.3, k:'cap', nose:6 } ], bst:{ n:2, d:3.7, h:54, nose:5 } },
+    file:'models/sls.glb', bytes:3944424, unit:1.0725,
+    model:{ src:'« NASA SLS Block 1 Crew V4 », Clarence365 (Sketchfab)', license:'CC BY 4.0', u:'https://sketchfab.com/3d-models/nasa-sls-block-1-crew-v4-2d521014700b44dbbc7662f648974e98', note:'Maquette regroupée par élément et allégée pour ce site (textures réduites). Mise à l\'échelle : 98,3 m de haut.' },
+    view:{ az:0.6, el:0.12, dist:2.1 }, sun:[0.6, 0.5, 0.6],
+    desc:'Le lanceur lunaire de la NASA, pour le programme Artemis. Il a lancé la capsule Orion sans équipage autour de la Lune le 16 novembre 2022 (Artemis I), puis avec quatre astronautes en avril 2026 (Artemis II). Ses quatre moteurs RS-25 ont volé sur la navette spatiale, comme ses deux propulseurs à poudre, allongés d\'un segment.',
+    checked:'2026-11-26',
+    refs:{
+      nasa1b:{ t:'SLS (Space Launch System) Block 1B (page de référence, comparaison avec le Block 1)', p:'NASA', u:'https://www.nasa.gov/reference/sls-space-launch-system-block-1b/' },
+      nasa:{ t:'Space Launch System', p:'NASA', u:'https://www.nasa.gov/humans-in-space/space-launch-system/' },
+      wp:{ t:'Space Launch System (article encyclopédique, figures de l\'infobox)', p:'Wikipédia (en)', u:'https://en.wikipedia.org/wiki/Space_Launch_System' }
+    },
+    parts:[
+      { key:'srb', name:'Deux propulseurs à poudre', desc:'Propulseurs à cinq segments, dérivés de ceux de la navette spatiale (quatre segments) ; ils fournissent l\'essentiel de la poussée pendant les deux premières minutes.',
+        facts:[['Poussée des deux propulseurs au décollage : 8,8 millions de livres-force (≈ 39 MN)', 'nasa1b']] },
+      { key:'core', name:'Étage central', desc:'Le plus grand étage construit par la NASA : réservoirs d\'hydrogène et d\'oxygène liquides, qui alimentent quatre moteurs RS-25 pendant un peu plus de huit minutes.',
+        facts:[['Hauteur : 212 pieds (≈ 64,6 m)', 'nasa'], ['Fonctionnement : un peu plus de huit minutes', 'nasa']] },
+      { key:'rs25', name:'Quatre moteurs RS-25', desc:'Moteurs à hydrogène et oxygène liquides, au bas de l\'étage central ; ceux des premiers vols ont volé sur la navette spatiale.',
+        facts:[['Poussée de l\'étage central : plus de 2 millions de livres-force', 'nasa']] },
+      { key:'icps', name:'Étage supérieur ICPS (moteur RL10)', desc:'Étage cryogénique provisoire, dérivé de celui de la fusée Delta IV : il envoie Orion vers la Lune.',
+        facts:[['Poussée du RL10 : 24 750 livres-force (≈ 110 kN)', 'nasa']] },
+      { key:'orion', name:'Capsule Orion et module de service', desc:'Le vaisseau habité, pour quatre astronautes, avec son module de service européen (ESA) et ses panneaux solaires.',
+        facts:[] },
+      { key:'las', name:'Tour de sauvetage', desc:'En cas de problème au décollage ou pendant la montée, ses moteurs à poudre arrachent la capsule du lanceur. Larguée dès que la montée est sûre.',
+        facts:[] }
+    ],
+    sections:[
+      { title:'Lanceur', rows:[
+        ['Hauteur', '322,4 pieds (98,3 m), version avec équipage', 'nasa1b'],
+        ['Masse au décollage', '5,7 millions de livres (≈ 2 600 t)', 'nasa1b'],
+        ['Poussée au décollage', '8,8 millions de livres-force (≈ 39 MN)', 'nasa1b'],
+        ['Étages', 'deux propulseurs à poudre, étage central (quatre RS-25), étage supérieur ICPS', 'nasa']
+      ]},
+      { title:'Carrière', rows:[
+        ['Premier vol', '16 novembre 2022, Artemis I, pas de tir 39B du centre Kennedy', 'nasa'],
+        ['Premier vol habité', 'avril 2026, Artemis II', 'wp']
+      ]},
+      { title:'Capacités', rows:[
+        ['Vers la Lune', 'plus de 27 t', 'nasa1b'],
+        ['Orbite basse (200 km, 28,5°)', '95 t', 'wp']
+      ]}
+    ]
+  },
+  {
+    id:'soyuz2', name:'Soyouz-2', short:'Soyouz', year:'2004',
+    agency:'Roscosmos ; construit par RKTs Progress',
+    first:'2004-11-08', firstRef:'wp',
+    dims:{ h:{ v:46.3, ref:'wp' }, d:{ v:2.95, ref:'wp' }, mass:{ v:312, ref:'wp' } },
+    cap:[ { o:'LEO', t:8.67, note:'Soyouz-2.1b, 240 km, 51,6°, depuis Baïkonour', ref:'wp' }, { o:'TLI', t:2.35, note:'Soyouz-2.1b avec étage Fregat', ref:'wp' } ],
+    sil:{ body:[ { d:2.95, h:27.1, k:'core' }, { d:2.66, h:6.7, k:'up' }, { d:3.7, h:12.5, k:'fair', nose:5 } ], bst:{ n:4, d:2.68, h:19.6, nose:8 } },
+    file:'models/soyuz2.glb', bytes:96972, unit:1,
+    model:{ src:'« Soyuz-FG », Paculino (Sketchfab)', license:'CC BY 4.0', u:'https://sketchfab.com/3d-models/soyuz-fg-1320bf0fd1b242cd8cfda77d381a147f', note:'Maquette d\'un Soyouz-FG, le prédécesseur de Soyouz-2 (même architecture, coiffe pour vaisseau habité), regroupée par étage. Taille d\'origine de la maquette : 49,5 m avec sa coiffe.' },
+    view:{ az:0.6, el:0.12, dist:2.1 }, sun:[0.6, 0.5, 0.6],
+    desc:'Dernière version de la famille Soyouz, héritière de la fusée R-7 qui a lancé Spoutnik en 1957 et Gagarine en 1961. Quatre propulseurs en forme de cône entourent l\'étage central ; tous s\'allument au sol. Il lance les équipages et les cargos vers la Station spatiale internationale, et des satellites depuis Baïkonour, Plessetsk et Vostotchny.',
+    checked:'2026-11-26',
+    refs:{
+      wp:{ t:'Soyuz-2 (article encyclopédique, figures de l\'infobox)', p:'Wikipédia (en)', u:'https://en.wikipedia.org/wiki/Soyuz-2' }
+    },
+    parts:[
+      { key:'blockb', name:'Quatre propulseurs (blocs B, V, G, D)', desc:'Premier étage : quatre propulseurs coniques à kérosène et oxygène liquide, un moteur RD-107A chacun.',
+        facts:[['Hauteur : 19,6 m ; diamètre : 2,68 m', 'wp'], ['Poussée au sol : 838,5 kN chacun', 'wp'], ['Durée : 118 s', 'wp']] },
+      { key:'blocka', name:'Étage central (bloc A)', desc:'Deuxième étage, allumé au sol en même temps que les propulseurs ; moteur RD-108A.',
+        facts:[['Hauteur : 27,1 m ; diamètre : 2,95 m', 'wp'], ['Poussée au sol : 792,5 kN', 'wp'], ['Durée : 286 s', 'wp']] },
+      { key:'blocki', name:'Troisième étage (bloc I)', desc:'Moteur RD-0110 (Soyouz-2.1a) ou RD-0124 (Soyouz-2.1b), à kérosène et oxygène liquide.',
+        facts:[['Hauteur : 6,7 m ; diamètre : 2,66 m', 'wp'], ['Poussée : 298 kN (2.1a), 294,3 kN (2.1b)', 'wp']] },
+      { key:'fregat', name:'Étage Fregat (facultatif) et coiffe', desc:'Quatrième étage réallumable, à ergols stockables, pour les orbites hautes ; sous la coiffe avec les satellites.',
+        facts:[] }
+    ],
+    sections:[
+      { title:'Lanceur', rows:[
+        ['Hauteur', '46,3 m', 'wp'],
+        ['Diamètre', '2,95 m (étage central), 10,3 m avec les propulseurs', 'wp'],
+        ['Masse au décollage', '312 t', 'wp'],
+        ['Étages', 'trois, ou quatre avec Fregat', 'wp']
+      ]},
+      { title:'Carrière', rows:[
+        ['Premier vol', 'Soyouz-2.1a : 8 novembre 2004 ; Soyouz-2.1b : 27 décembre 2006', 'wp'],
+        ['Bases de lancement', 'Baïkonour, Plessetsk, Vostotchny', 'wp']
+      ]},
+      { title:'Capacités', rows:[
+        ['Orbite basse (240 km, 51,6°, Baïkonour)', 'Soyouz-2.1a : 7,43 t ; Soyouz-2.1b : 8,67 t', 'wp'],
+        ['Vers la Lune', 'Soyouz-2.1b : 2,35 t', 'wp']
+      ]}
+    ]
+  },
+  {
+    id:'cz5', name:'Longue Marche 5', short:'Longue Marche 5', year:'2016',
+    agency:'CASC ; construit par la CALT',
+    first:'2016-11-03', firstRef:'wp',
+    dims:{ h:{ v:56.97, ref:'wp' }, d:{ v:5, ref:'wp' }, mass:{ v:851.8, ref:'wp' } },
+    cap:[ { o:'LEO', t:25, note:'200 × 400 km', ref:'wp' }, { o:'GTO', t:14, ref:'wp' }, { o:'TLI', t:8.8, note:'8,8 à 9,4 t selon la source', ref:'wp' } ],
+    sil:{ body:[ { d:5, h:33.16, k:'core' }, { d:5, h:11.54, k:'up' }, { d:5.2, h:12.27, k:'fair', nose:5 } ], bst:{ n:4, d:3.35, h:27.6, nose:4 } },
+    file:'models/cz5.glb', bytes:2990984, unit:3.578,
+    model:{ src:'« Long March 5 rocket », andertan (Sketchfab)', license:'CC BY 4.0', u:'https://sketchfab.com/3d-models/long-march-5-rocket-4da241732264439c9112e66ebc3e16e8', note:'Maquette redécoupée en étages pour ce site d\'après la position de chaque face et les longueurs publiées des étages (tools/models/seg_cz5.js) : les limites entre étages sont approchées. Mise à l\'échelle : 56,97 m de haut.' },
+    view:{ az:0.6, el:0.12, dist:2.1 }, sun:[0.6, 0.5, 0.6],
+    desc:'Le lanceur lourd chinois, en service depuis 2016 au centre de Wenchang, sur l\'île de Hainan. Il a lancé la sonde martienne Tianwen-1, les missions lunaires Chang\'e 5 et Chang\'e 6 et, dans sa version 5B, les modules de la station Tiangong.',
+    checked:'2026-11-26',
+    refs:{
+      wp:{ t:'Long March 5 (article encyclopédique, figures de l\'infobox)', p:'Wikipédia (en)', u:'https://en.wikipedia.org/wiki/Long_March_5' },
+      sf:{ t:'Long March 5 Launch Vehicle', p:'Spaceflight101', u:'https://spaceflight101.com/spacerockets/?p=1667' }
+    },
+    parts:[
+      { key:'boosters', name:'Quatre propulseurs CZ-5-300', desc:'Propulseurs à kérosène et oxygène liquide, deux moteurs YF-100 chacun.',
+        facts:[['Hauteur : 27,6 m ; diamètre : 3,35 m', 'wp'], ['Poussée au sol : 2 400 kN chacun', 'wp'], ['Durée : 173 s', 'wp']] },
+      { key:'core', name:'Premier étage CZ-5-500', desc:'Étage cryogénique à hydrogène et oxygène liquides, deux moteurs YF-77.',
+        facts:[['Hauteur : 33,16 m ; diamètre : 5 m', 'wp'], ['Ergols : 165,3 t', 'wp'], ['Durée : 492 s', 'wp']] },
+      { key:'stage2', name:'Deuxième étage CZ-5-HO', desc:'Étage cryogénique, deux moteurs YF-75D ; absent de la version 5B, qui place directement ses charges en orbite basse.',
+        facts:[['Hauteur : 11,54 m', 'wp'], ['Poussée : 176,72 kN', 'wp'], ['Durée : 700 s', 'wp']] },
+      { key:'fairing', name:'Coiffe', desc:'Coiffe de 5,2 m de diamètre, en deux longueurs.',
+        facts:[['Longueur : 12,27 m ou 20,5 m', 'sf']] }
+    ],
+    sections:[
+      { title:'Lanceur', rows:[
+        ['Hauteur', '56,97 m (63,2 m avec la coiffe longue)', 'wp'],
+        ['Diamètre', '5 m', 'wp'],
+        ['Masse au décollage', '851,8 t', 'wp'],
+        ['Poussée au décollage', '10 565 kN', 'sf'],
+        ['Étages', 'quatre propulseurs, deux étages cryogéniques ; étage YZ-2 facultatif', 'wp']
+      ]},
+      { title:'Carrière', rows:[
+        ['Premier vol', 'CZ-5 : 3 novembre 2016 ; CZ-5B : 5 mai 2020', 'wp'],
+        ['Base de lancement', 'Wenchang (Hainan), pas de tir 1', 'wp']
+      ]},
+      { title:'Capacités', rows:[
+        ['Orbite basse (200 × 400 km)', '25 t (CZ-5B)', 'wp'],
+        ['Orbite de transfert géostationnaire', '14 t', 'wp'],
+        ['Vers la Lune', '8,8 à 9,4 t', 'wp']
+      ]}
+    ]
+  },
+  {
+    id:'saturnv', name:'Saturn V', short:'Saturn V', year:'1967',
+    agency:'NASA ; étages construits par Boeing, North American et Douglas',
+    first:'1967-11-09', firstRef:'wp', last:'1973-05-14', lastRef:'wp',
+    dims:{ h:{ v:111, ref:'wp' }, d:{ v:10, ref:'wp' }, mass:{ v:2965, ref:'wp' }, thrust:{ v:34500, ref:'wp' } },
+    cap:[ { o:'LEO', t:140, note:'185 km', ref:'wp' }, { o:'TLI', t:43.5, ref:'wp' } ],
+    sil:{ body:[ { d:10, h:42, k:'core' }, { d:10, h:24.87, k:'up' }, { d:6.6, h:17.86, k:'up' }, { d:6.6, h:8, k:'cap' }, { d:3.9, h:7, k:'cap' }, { d:1.2, h:11.27, k:'cap', nose:5 } ] },
+    file:'models/saturnv.glb', bytes:1873908, unit:0.005291,
+    model:{ src:'« Saturn V Rocket - Nasa », dannzjs (Sketchfab)', license:'CC BY 4.0', u:'https://sketchfab.com/3d-models/saturn-v-rocket-nasa-9b61dbd396334aca8faac51f9ef63f2e', note:'Maquette redécoupée en étages pour ce site d\'après la hauteur de chaque face et les longueurs publiées des étages (tools/models/cut.js) : les limites entre étages sont approchées. Mise à l\'échelle : 111 m de haut avec le vaisseau Apollo.' },
+    view:{ az:0.6, el:0.12, dist:2.1 }, sun:[0.6, 0.5, 0.6],
+    desc:'La fusée du programme Apollo, la plus puissante jamais mise en service jusqu\'aux années 2020. Neuf vols, d\'Apollo 8 à Apollo 17, ont emmené 24 astronautes vers la Lune. Son dernier vol a lancé Skylab, la première station spatiale américaine, aménagée dans un troisième étage de Saturn V.',
+    checked:'2026-11-26',
+    refs:{
+      wp:{ t:'Saturn V (article encyclopédique, figures de l\'infobox)', p:'Wikipédia (en)', u:'https://en.wikipedia.org/wiki/Saturn_V' }
+    },
+    parts:[
+      { key:'sic', name:'Premier étage S-IC (cinq moteurs F-1)', desc:'Étage à kérosène et oxygène liquide, construit par Boeing.',
+        facts:[['Hauteur : 42 m ; diamètre : 10 m', 'wp'], ['Poussée au sol : 33 000 kN', 'wp'], ['Durée : 150 s', 'wp']] },
+      { key:'sii', name:'Deuxième étage S-II (cinq moteurs J-2)', desc:'Étage à hydrogène et oxygène liquides, construit par North American.',
+        facts:[['Hauteur : 24,87 m ; diamètre : 10 m', 'wp'], ['Poussée dans le vide : 4 400 kN', 'wp'], ['Durée : 395 s', 'wp']] },
+      { key:'sivb', name:'Troisième étage S-IVB (un moteur J-2)', desc:'Étage à hydrogène et oxygène liquides, construit par Douglas. Il s\'allumait deux fois : pour atteindre l\'orbite terrestre, puis pour partir vers la Lune.',
+        facts:[['Hauteur : 17,86 m ; diamètre : 6,60 m', 'wp'], ['Poussée dans le vide : 1 000 kN', 'wp'], ['Durée : 165 s puis 312 s (deux allumages)', 'wp']] },
+      { key:'apollo', name:'Vaisseau Apollo et tour de sauvetage', desc:'Au sommet : l\'adaptateur qui abritait le module lunaire, le module de service, la capsule de l\'équipage et la tour de sauvetage.',
+        facts:[] }
+    ],
+    sections:[
+      { title:'Lanceur', rows:[
+        ['Hauteur', '111 m avec le vaisseau Apollo', 'wp'],
+        ['Diamètre', '10 m', 'wp'],
+        ['Masse au décollage', '2 822 à 2 965 t selon la mission', 'wp'],
+        ['Poussée au décollage', '34,5 MN', 'wp'],
+        ['Étages', 'trois', 'wp']
+      ]},
+      { title:'Carrière', rows:[
+        ['Premier vol', '9 novembre 1967 (Apollo 4)', 'wp'],
+        ['Dernier vol', '14 mai 1973 (Skylab)', 'wp'],
+        ['Vols', '13, dont 12 réussis et un échec partiel (Apollo 6)', 'wp'],
+        ['Base de lancement', 'centre Kennedy, complexe 39', 'wp']
+      ]},
+      { title:'Capacités', rows:[
+        ['Orbite basse (185 km)', '140 t', 'wp'],
+        ['Vers la Lune', '43,5 t', 'wp']
+      ]}
+    ]
+  },
+  {
+    id:'shuttle', name:'Navette spatiale américaine', short:'Navette', year:'1981',
+    agency:'NASA ; orbiteur construit par Rockwell, réservoir par Martin Marietta, propulseurs par Thiokol',
+    first:'1981-04-12', firstRef:'wp', last:'2011-07-21', lastRef:'wp',
+    dims:{ h:{ v:56, ref:'wp' }, d:{ v:8.7, ref:'wp' }, mass:{ v:2030, ref:'wp' } },
+    cap:[ { o:'LEO', t:27.5, note:'204 km', ref:'wp' }, { o:'GTO', t:4.94, note:'avec l\'étage IUS emporté dans la soute', ref:'wp' } ],
+    sil:{ body:[ { d:8.4, h:47, k:'core', nose:9 } ], bst:{ n:2, d:3.7, h:45, nose:5 }, side:{ d:5.2, h:37.2, y:6, nose:4 } },
+    file:'models/shuttle.glb', bytes:2431468, unit:1.264,
+    model:{ src:'« Space Shuttle (A) », NASA 3D Resources', license:'NASA (libre de droits)', u:'https://github.com/nasa/NASA-3D-Resources/tree/master/3D%20Models/Space%20Shuttle%20(A)', note:'Maquette sans couleurs de la NASA, redressée et regroupée en trois éléments pour ce site. Mise à l\'échelle sur la longueur du réservoir externe (47 m) : les autres longueurs sont approchées.' },
+    view:{ az:0.6, el:0.12, dist:2.1 }, sun:[0.6, 0.5, 0.6],
+    desc:'Le premier véhicule orbital conçu pour être réutilisé : l\'orbiteur, avec son équipage, revenait se poser comme un planeur, et les propulseurs à poudre étaient repêchés en mer ; seul le grand réservoir orange était perdu. En trente ans, elle a lancé et réparé le télescope Hubble, lancé Chandra, Galileo, Magellan et Ulysses, et assemblé la Station spatiale internationale. Deux accidents, Challenger en 1986 et Columbia en 2003, ont coûté la vie à 14 astronautes.',
+    checked:'2026-11-26',
+    refs:{
+      wp:{ t:'Space Shuttle (article encyclopédique, figures de l\'infobox)', p:'Wikipédia (en)', u:'https://en.wikipedia.org/wiki/Space_Shuttle' }
+    },
+    parts:[
+      { key:'srb', name:'Deux propulseurs d\'appoint à poudre', desc:'Les plus gros moteurs à poudre de leur époque, récupérés en mer sous parachutes puis rechargés.',
+        facts:[['Poussée : 13 MN chacun', 'wp'], ['Durée : 124 s', 'wp']] },
+      { key:'et', name:'Réservoir externe', desc:'Grand réservoir d\'hydrogène et d\'oxygène liquides qui alimentait les trois moteurs de l\'orbiteur ; largué juste avant l\'orbite, il retombait dans l\'océan.',
+        facts:[['Diamètre : 8,7 m', 'wp']] },
+      { key:'orbiter', name:'Orbiteur (trois moteurs RS-25)', desc:'L\'avion spatial, avec l\'équipage et une soute de 18 m de long. Ses moteurs brûlaient l\'hydrogène et l\'oxygène du réservoir externe pendant toute la montée.',
+        facts:[['Poussée au sol : 1 750 kN par moteur', 'wp'], ['Durée : 480 s', 'wp']] }
+    ],
+    sections:[
+      { title:'Lanceur', rows:[
+        ['Hauteur', '56 m', 'wp'],
+        ['Diamètre', '8,7 m (réservoir externe)', 'wp'],
+        ['Masse au décollage', '2 030 t', 'wp'],
+        ['Éléments', 'deux propulseurs à poudre, un réservoir externe, l\'orbiteur et ses trois moteurs', 'wp']
+      ]},
+      { title:'Carrière', rows:[
+        ['Premier vol', '12 avril 1981 (STS-1)', 'wp'],
+        ['Dernier vol', '21 juillet 2011 (STS-135)', 'wp'],
+        ['Vols', '135, dont deux accidents (Challenger, 1986 ; Columbia, 2003)', 'wp'],
+        ['Bases de lancement', 'centre Kennedy, complexes 39A et 39B', 'wp']
+      ]},
+      { title:'Capacités', rows:[
+        ['Orbite basse (204 km)', '27,5 t', 'wp'],
+        ['Vers la Station spatiale internationale', '16,05 t', 'wp'],
+        ['Orbite de transfert géostationnaire', '4,94 t avec l\'étage IUS', 'wp'],
+        ['Retour sur Terre', '14,4 t', 'wp']
+      ]}
+    ]
+  },
+  {
+    id:'delta2', name:'Delta II', short:'Delta II', year:'1989',
+    agency:'McDonnell Douglas, puis Boeing, puis United Launch Alliance',
+    first:'1989-02-14', firstRef:'wp', last:'2018-09-15', lastRef:'wp',
+    dims:{ h:{ v:38.9, ref:'wp' }, d:{ v:2.44, ref:'wp' }, mass:{ v:286.1, ref:'wp' } },
+    cap:[ { o:'LEO', t:6.107, note:'2,8 à 6,1 t selon la version (28,7°)', ref:'wp' }, { o:'GTO', t:2.18, note:'0,93 à 2,18 t selon la version', ref:'wp' } ],
+    sil:{ body:[ { d:2.44, h:26.1, k:'core' }, { d:2.44, h:6, k:'up' }, { d:2.9, h:6.8, k:'fair', nose:3 } ], bst:{ n:9, d:1.02, h:13, nose:1.5 } },
+    file:null,
+    view:{ az:0.6, el:0.12, dist:2.1 }, sun:[0.6, 0.5, 0.6],
+    desc:'Le lanceur moyen des missions scientifiques de la NASA pendant trente ans, avec 155 vols. Neuf propulseurs à poudre entouraient le plus souvent son premier étage. Il a lancé les rovers martiens Spirit et Opportunity, les sondes lunaires GRAIL, et des observatoires comme WMAP et Fermi.',
+    checked:'2026-11-26',
+    refs:{
+      wp:{ t:'Delta II (article encyclopédique, figures de l\'infobox)', p:'Wikipédia (en)', u:'https://en.wikipedia.org/wiki/Delta_II' }
+    },
+    parts:[
+      { key:'stage1', name:'Premier étage (moteur RS-27A)', desc:'Étage à kérosène et oxygène liquide, hérité du missile Thor.',
+        facts:[['Hauteur : 26,1 m ; diamètre : 2,44 m', 'wp'], ['Poussée : 1 054 kN', 'wp'], ['Durée : 260,5 s', 'wp']] },
+      { key:'gem', name:'Propulseurs GEM 40 (trois, quatre ou neuf)', desc:'Propulseurs à poudre ; avec neuf propulseurs, six s\'allument au sol et trois en vol.',
+        facts:[['Hauteur : 13 m ; diamètre : 1,02 m', 'wp'], ['Poussée : 499,2 kN chacun (allumés au sol)', 'wp'], ['Durée : 64 s', 'wp']] },
+      { key:'stage2', name:'Deuxième étage Delta-K (moteur AJ10-118K)', desc:'Étage à ergols stockables, réallumable.',
+        facts:[['Hauteur : 6 m ; diamètre : 2,44 m', 'wp'], ['Poussée : 43,6 kN', 'wp'], ['Durée : 431 s', 'wp']] },
+      { key:'fairing', name:'Coiffe et troisième étage Star 48B (facultatif)', desc:'Pour les sondes interplanétaires, un troisième étage à poudre s\'ajoutait sous la coiffe.',
+        facts:[['Star 48B : 66 kN pendant 87 s', 'wp']] }
+    ],
+    sections:[
+      { title:'Lanceur', rows:[
+        ['Hauteur', '38,9 m', 'wp'],
+        ['Diamètre', '2,44 m', 'wp'],
+        ['Masse au décollage', '152 à 286,1 t selon la version', 'wp'],
+        ['Étages', 'deux ou trois, avec trois, quatre ou neuf propulseurs à poudre', 'wp']
+      ]},
+      { title:'Carrière', rows:[
+        ['Premier vol', '14 février 1989', 'wp'],
+        ['Dernier vol', '15 septembre 2018 (ICESat-2)', 'wp'],
+        ['Vols', '155, dont 153 réussis, un échec et un échec partiel', 'wp'],
+        ['Bases de lancement', 'Cap Canaveral (SLC-17), Vandenberg (SLC-2W)', 'wp']
+      ]},
+      { title:'Capacités', rows:[
+        ['Orbite basse (28,7°)', '2,8 à 6,1 t selon la version', 'wp'],
+        ['Orbite héliosynchrone', '1,65 à 3,18 t selon la version', 'wp'],
+        ['Orbite de transfert géostationnaire', '0,93 à 2,18 t selon la version', 'wp']
+      ]}
+    ]
+  },
+  {
+    id:'atlas5', name:'Atlas V', short:'Atlas V', year:'2002',
+    agency:'United Launch Alliance (développé par Lockheed Martin)',
+    first:'2002-08-21', firstRef:'wp',
+    dims:{ h:{ v:58.3, ref:'wp' }, d:{ v:3.81, ref:'wp' }, mass:{ v:590, ref:'wp' } },
+    cap:[ { o:'LEO', t:18.814, note:'version 551 (cinq propulseurs, coiffe de 5 m)', ref:'wp' }, { o:'GTO', t:8.9, note:'version 551', ref:'wp' } ],
+    sil:{ body:[ { d:3.81, h:32.46, k:'core' }, { d:5.4, h:25.84, k:'fair', nose:6 } ], bst:{ n:5, d:1.6, h:17, nose:2 } },
+    file:'models/atlas5.glb', bytes:516464, unit:0.9725,
+    model:{ src:'« Atlas V », SunnyChen754 (Sketchfab)', license:'CC BY 4.0', u:'https://sketchfab.com/3d-models/atlas-v-cbf8f28c35134aff9839275374521dba', note:'Maquette de la version 551, redécoupée pour ce site d\'après la position de chaque face (tools/models/cut.js) : la limite entre premier étage et coiffe est approchée. Mise à l\'échelle : 58,3 m de haut.' },
+    view:{ az:0.6, el:0.12, dist:2.1 }, sun:[0.6, 0.5, 0.6],
+    desc:'Un lanceur américain très fiable, en fin de carrière : son premier étage utilise un moteur russe RD-180 et son étage supérieur Centaur brûle de l\'hydrogène. Il a lancé Mars Reconnaissance Orbiter, New Horizons vers Pluton, Juno vers Jupiter, et les rovers Curiosity et Perseverance.',
+    checked:'2026-11-26',
+    refs:{
+      wp:{ t:'Atlas V (article encyclopédique, figures de l\'infobox et tableau des versions)', p:'Wikipédia (en)', u:'https://en.wikipedia.org/wiki/Atlas_V' }
+    },
+    parts:[
+      { key:'ccb', name:'Premier étage (moteur RD-180)', desc:'Le « Common Core Booster », à kérosène et oxygène liquide, avec un moteur russe à deux chambres.',
+        facts:[['Hauteur : 32,46 m ; diamètre : 3,81 m', 'wp'], ['Poussée au sol : 3 827 kN', 'wp'], ['Durée : 253 s', 'wp']] },
+      { key:'srb', name:'Propulseurs à poudre (zéro à cinq)', desc:'Le chiffre des dizaines du nom de version donne leur nombre : la version 551 en a cinq.',
+        facts:[['AJ-60A : 17 m ; 1,6 m de diamètre', 'wp'], ['GEM 63 (depuis 2020) : 20,1 m', 'wp'], ['Durée : 94 s', 'wp']] },
+      { key:'fairing', name:'Coiffe et deuxième étage Centaur', desc:'Coiffe de 4,2 m (versions 4xx) ou de 5,4 m (versions 5xx) ; la grande coiffe enveloppe aussi le deuxième étage Centaur, à hydrogène et oxygène liquides, avec un ou deux moteurs RL10.',
+        facts:[['Coiffe de 5,4 m : 20,7, 23,4 ou 26,5 m de long', 'wp'], ['Centaur : 12,68 m ; diamètre 3,05 m ; 842 s (un RL10A)', 'wp']] }
+    ],
+    sections:[
+      { title:'Lanceur', rows:[
+        ['Hauteur', 'jusqu\'à 58,3 m', 'wp'],
+        ['Diamètre', '3,81 m', 'wp'],
+        ['Masse au décollage', '590 t (version la plus lourde)', 'wp'],
+        ['Étages', 'deux, avec zéro à cinq propulseurs à poudre', 'wp']
+      ]},
+      { title:'Carrière', rows:[
+        ['Premier vol', '21 août 2002', 'wp'],
+        ['Vols', '109, dont 108 réussis et un échec partiel', 'wp'],
+        ['État', 'en fin de carrière : huit lanceurs restaient à lancer en avril 2026', 'wp'],
+        ['Bases de lancement', 'Cap Canaveral (SLC-41), Vandenberg (SLC-3E, jusqu\'en 2022)', 'wp']
+      ]},
+      { title:'Capacités', rows:[
+        ['Orbite basse (28,7°)', '9,8 t (version 401) à 18,8 t (version 551)', 'wp'],
+        ['Orbite de transfert géostationnaire', '4,75 t (version 401) à 8,9 t (version 551)', 'wp']
+      ]}
+    ]
+  },
+  {
+    id:'titan4', name:'Titan IV', short:'Titan IV', year:'1989',
+    agency:'US Air Force ; construit par Martin Marietta, puis Lockheed Martin',
+    first:'1989-06-14', firstRef:'wp', last:'2005-10-19', lastRef:'wp',
+    dims:{ h:{ v:62, ref:'wp' }, d:{ v:3.05, ref:'wp' }, mass:{ v:943, ref:'wp' } },
+    cap:[ { o:'LEO', t:21.68, ref:'wp' } ],
+    sil:{ body:[ { d:3.05, h:26.4, k:'core' }, { d:3.05, h:10, k:'up' }, { d:5.1, h:25.6, k:'fair', nose:6 } ], bst:{ n:2, d:3.2, h:34, nose:4 } },
+    file:'models/titan4.glb', bytes:522628, unit:4.539,
+    model:{ src:'« Titan IV », AllThingsSpace (Sketchfab)', license:'CC BY 4.0', u:'https://sketchfab.com/3d-models/titan-iv-0560341d278d4308b7a330ca4e75f1ae', note:'Maquette d\'une Titan IVB ; seul l\'exemplaire assemblé est gardé (la maquette d\'origine en montre aussi un éclaté). Redécoupée en étages pour ce site d\'après la position de chaque face (tools/models/cut.js) : les limites entre étages sont approchées. Mise à l\'échelle : 62 m de haut.' },
+    view:{ az:0.6, el:0.12, dist:2.1 }, sun:[0.6, 0.5, 0.6],
+    desc:'Le lanceur lourd de l\'armée de l\'air américaine dans les années 1990. Ses deux étages brûlaient des ergols stockables, et deux énormes propulseurs à poudre l\'aidaient au décollage. Une seule de ses missions n\'était pas militaire : Cassini-Huygens, partie vers Saturne en 1997.',
+    checked:'2026-11-26',
+    refs:{
+      wp:{ t:'Titan IV (article encyclopédique, figures de l\'infobox)', p:'Wikipédia (en)', u:'https://en.wikipedia.org/wiki/Titan_IV' }
+    },
+    parts:[
+      { key:'srmu', name:'Deux propulseurs à poudre SRMU (Titan IVB)', desc:'Propulseurs à enveloppe composite, allumés au sol.',
+        facts:[['Poussée : 7,56 MN chacun', 'wp'], ['Durée : 140 s', 'wp']] },
+      { key:'stage1', name:'Premier étage (deux moteurs LR87)', desc:'Étage à ergols stockables (peroxyde d\'azote et Aérozine 50), allumé en vol, peu avant la fin des propulseurs.',
+        facts:[['Poussée : 2 438 kN', 'wp'], ['Durée : 164 s', 'wp']] },
+      { key:'stage2', name:'Deuxième étage (moteur LR91)', desc:'Étage à ergols stockables.',
+        facts:[['Poussée : 467 kN', 'wp'], ['Durée : 223 s', 'wp']] },
+      { key:'centaur', name:'Étage Centaur et coiffe', desc:'Étage supérieur facultatif à hydrogène et oxygène liquides, sous une coiffe de 5,1 m de diamètre.',
+        facts:[['Centaur : deux moteurs RL10, 147 kN, 625 s', 'wp'], ['Coiffe : 5,1 m de diamètre, 17 à 26 m de long', 'wp']] }
+    ],
+    sections:[
+      { title:'Lanceur', rows:[
+        ['Hauteur', '50 à 62 m selon la coiffe', 'wp'],
+        ['Diamètre', '3,05 m', 'wp'],
+        ['Masse au décollage', '943 t', 'wp'],
+        ['Étages', 'trois à cinq, avec deux propulseurs à poudre', 'wp']
+      ]},
+      { title:'Carrière', rows:[
+        ['Premier vol', 'Titan IVA : 14 juin 1989 ; Titan IVB : 23 février 1997', 'wp'],
+        ['Dernier vol', '19 octobre 2005', 'wp'],
+        ['Vols', '39, dont 35 réussis', 'wp'],
+        ['Bases de lancement', 'Cap Canaveral (SLC-40 et 41), Vandenberg (SLC-4E)', 'wp']
+      ]},
+      { title:'Capacités', rows:[
+        ['Orbite basse', '21,68 t', 'wp'],
+        ['Orbite géostationnaire (avec Centaur)', '5,76 t', 'wp']
+      ]}
+    ]
+  },
+  {
+    id:'protonm', name:'Proton-M', short:'Proton-M', year:'2001',
+    agency:'Roscosmos ; construit par Khrounitchev',
+    first:'2001-04-07', firstRef:'wp',
+    dims:{ h:{ v:58.2, ref:'wp' }, d:{ v:7.4, ref:'wp' }, mass:{ v:705, ref:'wp' } },
+    cap:[ { o:'LEO', t:23, ref:'wp' }, { o:'GTO', t:6.92, note:'avec l\'étage Breeze-M ; orbite à 1 800 m/s du géostationnaire', ref:'wp' } ],
+    sil:{ body:[ { d:7.4, h:21.18, k:'core' }, { d:4.1, h:17.05, k:'up' }, { d:4.1, h:4.11, k:'up' }, { d:4.35, h:15.86, k:'fair', nose:5 } ] },
+    file:'models/protonm.glb', bytes:1748956, unit:32.24,
+    model:{ src:'« Proton-M Heavy launch vehicle », Kuat-Entralla 3D Engineering (Sketchfab)', license:'CC BY 4.0', u:'https://sketchfab.com/3d-models/proton-m-heavy-launch-vehicle-d070389b42be4f2b8aa67104e15885ca', note:'Maquette redécoupée en étages pour ce site d\'après la hauteur de chaque face et les longueurs publiées des étages (tools/models/cut.js) : les limites entre étages sont approchées. Mise à l\'échelle : 58,2 m de haut.' },
+    view:{ az:0.6, el:0.12, dist:2.1 }, sun:[0.6, 0.5, 0.6],
+    desc:'Le lanceur lourd russe, version modernisée de la Proton des années 1960. Son premier étage est entouré de six réservoirs et brûle des ergols toxiques mais stockables. Il a lancé des satellites de télécommunication, des modules de la Station spatiale internationale (Zvezda, Nauka) et des sondes vers Mars.',
+    checked:'2026-11-26',
+    refs:{
+      wp:{ t:'Proton-M (article encyclopédique, figures de l\'infobox)', p:'Wikipédia (en)', u:'https://en.wikipedia.org/wiki/Proton-M' }
+    },
+    parts:[
+      { key:'stage1', name:'Premier étage (six moteurs RD-275M)', desc:'Un réservoir central d\'oxydant entouré de six réservoirs de carburant, chacun portant un moteur.',
+        facts:[['Hauteur : 21,18 m ; diamètre : 7,4 m', 'wp'], ['Poussée : 10 532 kN', 'wp'], ['Durée : 108 s', 'wp']] },
+      { key:'stage2', name:'Deuxième étage (quatre moteurs)', desc:'Trois moteurs RD-0210 et un RD-0211.',
+        facts:[['Hauteur : 17,05 m ; diamètre : 4,1 m', 'wp'], ['Poussée : 2 399 kN', 'wp'], ['Durée : 206 s', 'wp']] },
+      { key:'stage3', name:'Troisième étage', desc:'Étage à ergols stockables.',
+        facts:[['Hauteur : 4,11 m ; diamètre : 4,1 m', 'wp'], ['Poussée : 613,8 kN', 'wp'], ['Durée : 238 s', 'wp']] },
+      { key:'breeze', name:'Étage Breeze-M et coiffe', desc:'Étage supérieur réallumable pour les orbites hautes, sous une coiffe de 4,35 m de diamètre.',
+        facts:[['Breeze-M : 19,62 kN, jusqu\'à 3 000 s de fonctionnement', 'wp']] }
+    ],
+    sections:[
+      { title:'Lanceur', rows:[
+        ['Hauteur', '58,2 m', 'wp'],
+        ['Diamètre', '7,4 m', 'wp'],
+        ['Masse au décollage', '705 t', 'wp'],
+        ['Étages', 'trois, ou quatre avec Breeze-M ou Blok DM', 'wp']
+      ]},
+      { title:'Carrière', rows:[
+        ['Premier vol', '7 avril 2001', 'wp'],
+        ['Vols', '116, dont 105 réussis (fiche consultée le 26 novembre 2026)', 'wp'],
+        ['Base de lancement', 'Baïkonour', 'wp']
+      ]},
+      { title:'Capacités', rows:[
+        ['Orbite basse', '23 t', 'wp'],
+        ['Orbite de transfert géostationnaire', '6,92 t (avec Breeze-M)', 'wp'],
+        ['Orbite géostationnaire', '3,25 t', 'wp']
+      ]}
+    ]
+  },
+  {
+    id:'h2a', name:'H-IIA', short:'H-IIA', year:'2001',
+    agency:'JAXA et Mitsubishi Heavy Industries',
+    first:'2001-08-29', firstRef:'wp', last:'2025-06-28', lastRef:'wp',
+    dims:{ h:{ v:53, ref:'wp' }, d:{ v:4, ref:'wp' }, mass:{ v:285, ref:'wp' } },
+    cap:[ { o:'LEO', t:10, note:'10 à 15 t selon la version', approx:true, ref:'wp' }, { o:'GTO', t:4.1, note:'version 202 ; 6 t en version 204', ref:'wp' } ],
+    sil:{ body:[ { d:4, h:37.2, k:'core' }, { d:4, h:4, k:'up' }, { d:4, h:11.8, k:'fair', nose:4 } ], bst:{ n:2, d:2.5, h:15.1, nose:3 } },
+    file:'models/h2a.glb', bytes:591980, unit:1,
+    model:{ src:'« H-IIA Rocket », MarioK (Sketchfab)', license:'CC BY 4.0', u:'https://sketchfab.com/3d-models/h-iia-rocket-99a86c831c2a4b24bdd42365e382427e', note:'Maquette regroupée par étage pour ce site ; hauteur d\'origine : 53 m.' },
+    view:{ az:0.6, el:0.12, dist:2.1 }, sun:[0.6, 0.5, 0.6],
+    desc:'Le lanceur principal du Japon pendant près de 25 ans, tiré de Tanegashima. Ses deux étages brûlent de l\'hydrogène et de l\'oxygène liquides. Il a lancé la sonde lunaire Kaguya, la sonde vénusienne Akatsuki et Hayabusa2, qui a rapporté des échantillons de l\'astéroïde Ryugu. Son successeur est H3.',
+    checked:'2026-11-26',
+    refs:{
+      wp:{ t:'H-IIA (article encyclopédique, figures de l\'infobox)', p:'Wikipédia (en)', u:'https://en.wikipedia.org/wiki/H-IIA' }
+    },
+    parts:[
+      { key:'stage1', name:'Premier étage (moteur LE-7A)', desc:'Étage à hydrogène et oxygène liquides.',
+        facts:[['Hauteur : 37,2 m ; diamètre : 4 m', 'wp'], ['Poussée : 1 098 kN', 'wp'], ['Durée : 390 s', 'wp']] },
+      { key:'srb', name:'Propulseurs à poudre SRB-A (deux ou quatre)', desc:'La version 202 en a deux, la version 204 quatre.',
+        facts:[['Hauteur : 15,1 m ; diamètre : 2,5 m', 'wp'], ['Poussée : 2 260 kN chacun', 'wp'], ['Durée : 120 s', 'wp']] },
+      { key:'stage2', name:'Deuxième étage (moteur LE-5B)', desc:'Étage à hydrogène et oxygène liquides, réallumable.',
+        facts:[['Hauteur : 9,2 m ; diamètre : 4 m', 'wp'], ['Poussée : 137 kN', 'wp'], ['Durée : 534 s', 'wp']] },
+      { key:'fairing', name:'Coiffe', desc:'Coiffe de 4 m de diamètre, qui enveloppe le haut du deuxième étage.', facts:[] }
+    ],
+    sections:[
+      { title:'Lanceur', rows:[
+        ['Hauteur', '53 m', 'wp'],
+        ['Diamètre', '4 m', 'wp'],
+        ['Masse au décollage', '285 t (version 202) à 445 t', 'wp'],
+        ['Étages', 'deux, avec deux ou quatre propulseurs à poudre', 'wp']
+      ]},
+      { title:'Carrière', rows:[
+        ['Premier vol', '29 août 2001', 'wp'],
+        ['Dernier vol', '28 juin 2025 (50e vol)', 'wp'],
+        ['Vols', '50, dont 49 réussis', 'wp'],
+        ['Base de lancement', 'Tanegashima', 'wp']
+      ]},
+      { title:'Capacités', rows:[
+        ['Orbite basse', '10 à 15 t selon la version', 'wp'],
+        ['Orbite de transfert géostationnaire', '4,1 t (version 202) à 6 t (version 204)', 'wp']
+      ]}
+    ]
+  },
+  {
+    id:'pslv', name:'PSLV', short:'PSLV', year:'1993',
+    agency:'ISRO (Organisation indienne de recherche spatiale)',
+    first:'1993-09-20', firstRef:'wp',
+    dims:{ h:{ v:44, ref:'wp' }, d:{ v:2.8, ref:'wp' }, mass:{ v:320, ref:'wp' } },
+    cap:[ { o:'LEO', t:3.8, note:'PSLV-XL, 200 km, 30°', ref:'wp' }, { o:'GTO', t:1.3, note:'PSLV-XL', ref:'wp' } ],
+    sil:{ body:[ { d:2.8, h:20, k:'core' }, { d:2.8, h:12.8, k:'up' }, { d:2, h:3.6, k:'up' }, { d:3.2, h:7.6, k:'fair', nose:3 } ], bst:{ n:6, d:1, h:12, nose:1.5 } },
+    file:'models/pslv.glb', bytes:822728, unit:0.1729,
+    model:{ src:'« PSLV C40 », Neel3Dartist (Sketchfab)', license:'CC BY 4.0', u:'https://sketchfab.com/3d-models/pslv-c40-c7066310704040a9bf0c86d7d21ab94f', note:'Maquette du vol PSLV-C40 (version XL), sans son socle, redécoupée en étages pour ce site d\'après la position de chaque face (tools/models/cut.js) : les limites entre étages sont approchées. Mise à l\'échelle : 44 m de haut.' },
+    view:{ az:0.6, el:0.12, dist:2.1 }, sun:[0.6, 0.5, 0.6],
+    desc:'Le lanceur à tout faire de l\'Inde, tiré de Sriharikota. Ses quatre étages alternent poudre et ergols liquides, et six petits propulseurs entourent le premier étage dans la version XL. Il a lancé Chandrayaan-1, la première sonde lunaire indienne, la sonde martienne Mangalyaan et l\'observatoire solaire Aditya-L1.',
+    checked:'2026-11-26',
+    refs:{
+      wp:{ t:'Polar Satellite Launch Vehicle (article encyclopédique, figures de l\'infobox)', p:'Wikipédia (en)', u:'https://en.wikipedia.org/wiki/Polar_Satellite_Launch_Vehicle' }
+    },
+    parts:[
+      { key:'ps1', name:'Premier étage PS1 (moteur à poudre S139)', desc:'L\'un des plus gros moteurs à poudre du monde.',
+        facts:[['Hauteur : 20 m ; diamètre : 2,8 m', 'wp'], ['Poussée : 4 846,9 kN', 'wp'], ['Durée : 110 s', 'wp']] },
+      { key:'psom', name:'Six propulseurs PSOM-XL', desc:'Propulseurs à poudre de la version XL.',
+        facts:[['Hauteur : 12 m ; diamètre : 1 m', 'wp'], ['Poussée : 703,5 kN chacun', 'wp'], ['Durée : 70 s', 'wp']] },
+      { key:'ps2', name:'Deuxième étage PS2 (moteur Vikas)', desc:'Étage à ergols liquides stockables.',
+        facts:[['Hauteur : 12,8 m ; diamètre : 2,8 m', 'wp'], ['Poussée : 803,7 kN', 'wp'], ['Durée : 151 s', 'wp']] },
+      { key:'ps3', name:'Troisième étage PS3 (poudre)', desc:'Étage à poudre.',
+        facts:[['Hauteur : 3,6 m ; diamètre : 2 m', 'wp'], ['Poussée : 250 kN', 'wp']] },
+      { key:'ps4', name:'Quatrième étage PS4 et coiffe', desc:'Petit étage à ergols liquides, avec deux moteurs, sous la coiffe avec les satellites.',
+        facts:[['PS4 : hauteur 3 m ; diamètre 1,3 m ; 525 s', 'wp']] }
+    ],
+    sections:[
+      { title:'Lanceur', rows:[
+        ['Hauteur', '44 m', 'wp'],
+        ['Diamètre', '2,8 m', 'wp'],
+        ['Masse au décollage', '320 t (PSLV-XL)', 'wp'],
+        ['Étages', 'quatre, avec zéro, deux, quatre ou six propulseurs à poudre selon la version', 'wp']
+      ]},
+      { title:'Carrière', rows:[
+        ['Premier vol', '20 septembre 1993 ; version XL : 22 octobre 2008', 'wp'],
+        ['Vols', '64, dont 59 réussis (fiche consultée le 26 novembre 2026)', 'wp'],
+        ['Base de lancement', 'centre spatial Satish Dhawan, Sriharikota', 'wp']
+      ]},
+      { title:'Capacités', rows:[
+        ['Orbite basse (200 km, 30°)', '3,8 t (PSLV-XL)', 'wp'],
+        ['Orbite héliosynchrone (620 km)', '1,75 t (PSLV-XL)', 'wp'],
+        ['Orbite de transfert géostationnaire', '1,3 t (PSLV-XL)', 'wp']
+      ]}
+    ]
+  },
+  {
+    id:'vega', name:'Vega', short:'Vega', year:'2012',
+    agency:'Arianespace pour l\'ESA et l\'ASI ; construit par Avio',
+    first:'2012-02-13', firstRef:'wp', last:'2024-09-05', lastRef:'wp',
+    dims:{ h:{ v:30, ref:'wp' }, d:{ v:3, ref:'wp' }, mass:{ v:137, ref:'wp' } },
+    cap:[ { o:'LEO', t:1.43, note:'orbite polaire à 700 km', ref:'wp' } ],
+    sil:{ body:[ { d:3, h:11.7, k:'core' }, { d:1.9, h:8.39, k:'up' }, { d:1.9, h:4.12, k:'up' }, { d:2.6, h:5.79, k:'fair', nose:3 } ] },
+    file:null,
+    view:{ az:0.6, el:0.12, dist:2.1 }, sun:[0.6, 0.5, 0.6],
+    desc:'Le petit lanceur européen, lancé de Kourou de 2012 à 2024 et remplacé par Vega-C. Trois étages à poudre et un petit étage supérieur réallumable, AVUM, qui dépose les satellites un par un. Il a lancé LISA Pathfinder en 2015 et plusieurs satellites Sentinel de Copernicus.',
+    checked:'2026-11-26',
+    refs:{
+      wp:{ t:'Vega (rocket) (article encyclopédique, figures de l\'infobox)', p:'Wikipédia (en)', u:'https://en.wikipedia.org/wiki/Vega_(rocket)' }
+    },
+    parts:[
+      { key:'p80', name:'Premier étage P80', desc:'Moteur à poudre à enveloppe en fibre de carbone.',
+        facts:[['Hauteur : 11,7 m ; diamètre : 3 m', 'wp'], ['Poussée : 2 261 kN', 'wp'], ['Durée : 107 s', 'wp']] },
+      { key:'z23', name:'Deuxième étage Zefiro 23', desc:'Moteur à poudre.',
+        facts:[['Hauteur : 8,39 m ; diamètre : 1,9 m', 'wp'], ['Poussée : 871 kN', 'wp'], ['Durée : 71,6 s', 'wp']] },
+      { key:'z9', name:'Troisième étage Zefiro 9', desc:'Moteur à poudre.',
+        facts:[['Hauteur : 4,12 m ; diamètre : 1,9 m', 'wp'], ['Poussée : 260 kN', 'wp'], ['Durée : 117 s', 'wp']] },
+      { key:'avum', name:'Étage AVUM et coiffe', desc:'Étage à ergols liquides, réallumable jusqu\'à cinq fois, sous une coiffe de 2,6 m de diamètre.',
+        facts:[['AVUM : 2,45 kN, jusqu\'à 612,5 s', 'wp'], ['Coiffe : 7,8 m de haut', 'wp']] }
+    ],
+    sections:[
+      { title:'Lanceur', rows:[
+        ['Hauteur', '30 m', 'wp'],
+        ['Diamètre', '3 m', 'wp'],
+        ['Masse au décollage', '137 t', 'wp'],
+        ['Étages', 'trois à poudre et un étage liquide AVUM', 'wp']
+      ]},
+      { title:'Carrière', rows:[
+        ['Premier vol', '13 février 2012', 'wp'],
+        ['Dernier vol', '5 septembre 2024 (Sentinel-2C)', 'wp'],
+        ['Vols', '22, dont 20 réussis', 'wp'],
+        ['Base de lancement', 'Kourou (ensemble de lancement Vega)', 'wp']
+      ]},
+      { title:'Capacités', rows:[
+        ['Orbite polaire (700 km)', '1,43 t', 'wp'],
+        ['Orbite héliosynchrone (400 km)', '1,45 t', 'wp']
+      ]}
+    ]
+  },
+  {
+    id:'starship', name:'Starship', short:'Starship', year:'2023', status:'dev',
+    agency:'SpaceX',
+    first:'2023-04-20', firstRef:'wp',
+    dims:{ h:{ v:123.1, ref:'wp' }, d:{ v:9, ref:'wp' }, mass:{ v:5000, ref:'wp', approx:true } },
+    cap:[ { o:'LEO', t:100, note:'objectif annoncé pour la version réutilisable (Block 3) ; 35 t pour la Block 2', approx:true, ref:'wp' }, { o:'GTO', t:27, note:'objectif annoncé, version réutilisable', approx:true, ref:'wp' } ],
+    sil:{ body:[ { d:9, h:71, k:'core' }, { d:9, h:52.1, k:'up', nose:12 } ] },
+    file:'models/starship.glb', bytes:6259568, unit:4.946,
+    model:{ src:'« SpaceX Starship Block 3 », Clarence365 (Sketchfab)', license:'CC BY 4.0', u:'https://sketchfab.com/3d-models/spacex-starship-block-3-6f6c6f88a3eb4b4d822fdca66733fbb2', note:'Maquette de la version Block 3, regroupée en deux étages et allégée pour ce site. Mise à l\'échelle : 124,4 m de haut (Block 3).' },
+    view:{ az:0.6, el:0.12, dist:2.1 }, sun:[0.6, 0.5, 0.6],
+    desc:'Le plus grand lanceur jamais construit, encore en développement. Ses deux étages, le propulseur Super Heavy et le vaisseau Starship, brûlent du méthane et de l\'oxygène liquides et doivent être entièrement réutilisables : le propulseur revient se faire attraper par la tour de lancement, une première réussie le 13 octobre 2024. Treize vols d\'essai ont eu lieu à la date de la fiche.',
+    checked:'2026-11-26',
+    refs:{
+      wp:{ t:'SpaceX Starship (article encyclopédique, figures de l\'infobox)', p:'Wikipédia (en)', u:'https://en.wikipedia.org/wiki/SpaceX_Starship' }
+    },
+    parts:[
+      { key:'booster', name:'Propulseur Super Heavy (33 moteurs Raptor)', desc:'Premier étage au méthane et à l\'oxygène liquides, conçu pour revenir au-dessus du pas de tir.',
+        facts:[['Hauteur : 71 m (Block 1 et 2) ; diamètre : 9 m', 'wp'], ['Ergols : 3 250 t (Block 2)', 'wp']] },
+      { key:'ship', name:'Vaisseau Starship (six moteurs Raptor)', desc:'Deuxième étage et vaisseau, avec trois moteurs pour l\'atmosphère et trois pour le vide.',
+        facts:[['Hauteur : 52,1 m (Block 2) ; diamètre : 9 m', 'wp'], ['Ergols : 1 500 t (Block 2)', 'wp']] }
+    ],
+    sections:[
+      { title:'Lanceur', rows:[
+        ['Hauteur', '121,3 m (Block 1), 123,1 m (Block 2), 124,4 m (Block 3)', 'wp'],
+        ['Diamètre', '9 m', 'wp'],
+        ['Masse au décollage', 'environ 5 000 t', 'wp'],
+        ['Étages', 'deux, réutilisables', 'wp']
+      ]},
+      { title:'Carrière', rows:[
+        ['Premier vol', '20 avril 2023', 'wp'],
+        ['Vols d\'essai', '13 au 24 juillet 2026, dont 8 réussis', 'wp'],
+        ['État', 'en développement', 'wp'],
+        ['Base de lancement', 'Starbase (Texas)', 'wp']
+      ]},
+      { title:'Capacités (objectifs)', rows:[
+        ['Orbite basse', 'Block 2 : 35 t ; Block 3 : 100 t ; version réutilisable de référence : 100 à 150 t', 'wp'],
+        ['Orbite de transfert géostationnaire', '27 t (version réutilisable de référence)', 'wp']
+      ]}
+    ]
+  }
+];
+
+/* Textes anglais des lanceurs : EN_MISSIONS[id] = { name, short, agency, desc, sections, refs, parts, model } (mêmes champs que MISSIONS).
+   Les clés de source des lignes de la fiche sont reprises du français ; short et model.note sont appliqués par app.js. */
+var EN_MISSIONS = {
+  ariane5:{
+    agency:'ESA, ArianeGroup; operated by Arianespace',
+    desc:'Europe\'s heavy launcher from 1996 to 2023: 117 flights from Kourou, including the James Webb telescope in 2021 and the JUICE probe in 2023. Its ECA version, the most powerful, could place two telecommunications satellites at once into geostationary transfer orbit.',
+    refs:{ esa:'Ariane 5 ECA (page published 5 March 2004)' },
+    parts:{
+      eap:{ name:'EAP solid boosters', desc:'Two solid boosters attached on either side of the main stage; they provide most of the thrust at lift-off, then separate.', facts:['Thrust of both boosters at lift-off: 1,300 tonnes'] },
+      epc:{ name:'EPC main stage (Vulcain 2 engine)', desc:'Cryogenic stage ignited on the ground, a few seconds before the boosters, which runs for nearly nine minutes.', facts:['Propellants: 150 t of liquid oxygen and 25 t of liquid hydrogen', 'Vulcain 2 thrust: up to 137 tonnes', 'Burn time: nearly 540 s'] },
+      esc:{ name:'ESC-A upper stage (HM7B engine)', desc:'Cryogenic stage that completes the injection into orbit.', facts:['Propellants: 14.7 t', 'HM7B vacuum thrust: 6.5 tonnes', 'Burn time: nearly 940 s'] },
+      fairing:{ name:'Fairing', desc:'Protects the satellites through the atmosphere, then opens in two. For a dual launch, a structure (Sylda) separates the two satellites under the fairing.' }
+    },
+    model:{ license:'CC BY 4.0', note:'Model grouped by stage from the position of each piece, and lightened for this site. Scaled to 53 m tall.' },
+    sections:[
+      { title:'Launcher', rows:[ ['Height', 'up to 53 m'], ['Diameter', 'up to 5.4 m'], ['Lift-off mass', '780 t (dual launch)'], ['Stages', 'two EAP solid boosters, EPC main stage, ESC-A upper stage'] ]},
+      { title:'Career', rows:[ ['First flight', '4 June 1996 (first ECA flight: 11 December 2002, failure)'], ['Last flight', '5 July 2023, 117th flight'], ['Reliability', '98.4% at its last flight'], ['Launch site', 'Guiana Space Centre, Kourou (ELA-3 complex)'] ]},
+      { title:'Capabilities', rows:[ ['Geostationary transfer orbit', '10 t in dual launch, 10.8 t in single launch'], ['Low Earth orbit', 'up to 21 t'] ]}
+    ]
+  },
+  ariane6:{
+    agency:'ESA, ArianeGroup; operated by Arianespace',
+    desc:'Ariane 5\'s successor, first launched on 9 July 2024 from Kourou. Two versions: Ariane 62, with two solid boosters, and Ariane 64, with four. Its upper stage, powered by the Vinci engine, can reignite to drop satellites into several orbits during one flight.',
+    refs:{ esa1:'Europe\'s new Ariane 6 rocket powers into space (first flight press release)' },
+    model:{ license:'CC BY 4.0', note:'Model grouped by stage and lightened for this site (reduced textures). Scaled to 62 m tall.' },
+    parts:{
+      p120c:{ name:'P120C solid boosters', desc:'Two (Ariane 62) or four (Ariane 64) solid boosters; the same motor is Vega-C\'s first stage.', facts:['Propellant: 142 t per booster', 'Lift-off thrust: 350 tonnes per booster', 'Burn time: 130 s'] },
+      llpm:{ name:'Main stage (Vulcain 2.1 engine)', desc:'Cryogenic stage burning liquid hydrogen and oxygen, which powers the first ten minutes of flight.', facts:['Propellants: 150 t', 'Vulcain 2.1 lift-off thrust: 135 tonnes'] },
+      ulpm:{ name:'Upper stage (Vinci engine)', desc:'Re-ignitable cryogenic stage: it can shut down and restart several times to reach different orbits.', facts:['Full tanks: 30 t', 'Vinci thrust: 18 tonnes'] },
+      fairing:{ name:'Fairing', desc:'Protects the satellites through the atmosphere, then opens in two.', facts:['Height: 14 or 20 m', 'Diameter: 5.4 m'] }
+    },
+    sections:[
+      { title:'Launcher', rows:[ ['Height', '62 m'], ['Diameter', '5.4 m (fairing)'], ['Lift-off mass', 'Ariane 62: 530 t; Ariane 64: 860 t'], ['Lift-off thrust', 'Ariane 62: 800 tonnes; Ariane 64: 1,500 tonnes'], ['Stages', 'two or four P120C boosters, main stage (Vulcain 2.1), upper stage (Vinci)'] ]},
+      { title:'Career', rows:[ ['First flight', '9 July 2024 (Ariane 62)'], ['Launch site', 'Guiana Space Centre, Kourou (new complex 4 km west of Ariane 5\'s)'] ]},
+      { title:'Capabilities', rows:[ ['Geostationary transfer orbit', 'Ariane 62: ≈ 4.5 t; Ariane 64: ≈ 11.5 t'], ['Low Earth orbit', 'Ariane 62: 10.3 t; Ariane 64: 21.6 t'] ]}
+    ]
+  },
+  vegac:{
+    agency:'ESA, Avio; operated by Avio',
+    model:{ license:'CC BY 4.0', note:'Model “inspired by Vega-C” according to its author (personal CAD model), not an exact replica. Grouped by stage and lightened for this site. Scaled to 34.8 m tall.' },
+    desc:'Small European launcher for Earth observation satellites and science missions in low orbit. Its first three stages are solid; the fourth, AVUM+, burns liquid propellants and can reignite. First flight on 13 July 2022, return to flight on 5 December 2024 after the late-2022 failure.',
+    parts:{
+      p120c:{ name:'P120C first stage', desc:'Solid motor, the same as Ariane 6\'s boosters.', facts:['Propellant: 143.6 t', 'Average thrust: 4,500 kN', 'Burn time: about two minutes'] },
+      z40:{ name:'Zefiro 40 second stage', desc:'Solid motor.', facts:['Propellant: 36.2 t', 'Average thrust: 1,304 kN'] },
+      z9:{ name:'Zefiro 9 third stage', desc:'Solid motor.', facts:['Propellant: 10 t', 'Burn time: two and a half minutes'] },
+      avum:{ name:'AVUM+ upper stage', desc:'Re-ignitable liquid-propellant stage, which trims the orbit and can release several satellites.', facts:['Propellants: 740 kg', 'Average thrust: 2.42 kN'] }
+    },
+    sections:[
+      { title:'Launcher', rows:[ ['Height', '34.8 m'], ['Diameter', '3.4 m'], ['Lift-off mass', '210 t'], ['Stages', 'P120C, Zefiro 40, Zefiro 9 (solid), AVUM+ (liquid)'] ]},
+      { title:'Career', rows:[ ['First flight', '13 July 2022'], ['Return to flight', '5 December 2024, after the late-2022 failure'], ['Launch site', 'Guiana Space Centre, Kourou'] ]},
+      { title:'Capabilities', rows:[ ['Low Earth orbit', '3.3 t'], ['Sun-synchronous orbit', '2.3 t'], ['Polar orbit, 700 km', 'up to 2.2 t'] ]}
+    ]
+  },
+  falcon9:{
+    desc:'The most used launcher in the world today. Its first stage, powered by nine Merlin engines, lands back on a ship at sea or near the launch pad, then flies again: it is the first orbital launcher whose first stage is routinely reused. It launches Starlink satellites, science missions and, with the Dragon capsule, crews to the International Space Station.',
+    refs:{ wv:'Falcon 9 v1.2 or Full Thrust (Block 5), specifications', wp:'Falcon 9 (encyclopedia article, infobox figures)' },
+    model:{ license:'CC BY 4.0', note:'Model grouped by stage and lightened for this site (reduced textures). Scaled to 70 m tall.' },
+    parts:{
+      stage1:{ name:'First stage (nine Merlin 1D engines)', desc:'Reusable kerosene and liquid-oxygen stage: after separation it relights three engines, steers with its grid fins and lands on four legs.', facts:['Height: 41.2 m (47.7 m with the interstage)', 'Thrust at sea level: 7,607 kN; in vacuum: 8,227 kN', 'Burn time: 162 s'] },
+      stage2:{ name:'Second stage (Merlin Vacuum engine)', desc:'Kerosene and liquid-oxygen stage, not recovered; its engine can reignite.', facts:['Height: 13.8 m', 'Vacuum thrust: 981 kN', 'Burn time: 397 s'] },
+      fairing:{ name:'Fairing', desc:'Two-half fairing, recovered at sea and reused. On crewed flights, the Dragon capsule replaces the fairing.', facts:['Height: 13.1 m; diameter: 5.2 m'] }
+    },
+    sections:[
+      { title:'Launcher', rows:[ ['Height', '70 m'], ['Diameter', '3.7 m'], ['Lift-off mass', '549,054 kg'], ['Lift-off thrust', '7,607 kN'], ['Stages', 'two, kerosene and liquid oxygen; reusable first stage'] ]},
+      { title:'Career', rows:[ ['First flight', '4 June 2010 (Block 5 version: 11 May 2018)'], ['Launch sites', 'Cape Canaveral (SLC-40), Kennedy Space Center (LC-39A), Vandenberg (SLC-4E)'] ]},
+      { title:'Capabilities', rows:[ ['Low Earth orbit (28.5°)', '22.8 t without recovery; 17.5 t with a ship landing'], ['Geostationary transfer orbit', '8.3 t without recovery; 5.5 t with a ship landing'], ['To Mars', '4.02 t'] ]}
+    ]
+  },
+  falconheavy:{
+    desc:'Three Falcon 9 first stages side by side, 27 Merlin engines lit at lift-off. The two side boosters often land back together near the pad. It launched the Psyche probe, the GOES-U weather satellite and the Europa Clipper probe to Jupiter.',
+    refs:{ wp:'Falcon Heavy (encyclopedia article; capabilities per SpaceX, “Capabilities & Services”)' },
+    model:{ license:'CC BY 4.0', note:'Model grouped by stage and lightened for this site (reduced textures). Scaled to 70 m tall.' },
+    parts:{
+      boosters:{ name:'Two side boosters', desc:'Two strengthened Falcon 9 first stages, with a nose cone instead of an upper stage; they separate first and can land back.', facts:['Nine Merlin 1D engines each', 'Thrust at sea level: 7,600 kN each', 'Burn time: 154.3 s'] },
+      core:{ name:'Centre core', desc:'Central first stage, strengthened to carry both boosters; its engines throttle down early on to last longer.', facts:['Nine Merlin 1D engines', 'Height: 42.6 m', 'Burn time: 187 s'] },
+      stage2:{ name:'Second stage (Merlin Vacuum engine)', desc:'The same as Falcon 9\'s.', facts:['Vacuum thrust: 934 kN', 'Burn time: 397 s'] },
+      fairing:{ name:'Fairing', desc:'The same fairing as Falcon 9.' }
+    },
+    sections:[
+      { title:'Launcher', rows:[ ['Height', '70 m'], ['Width', '12.2 m (each core: 3.7 m)'], ['Lift-off mass', '1,420 t'], ['Lift-off thrust', '22.82 MN (27 Merlin 1D engines)'], ['Stages', 'two side boosters and a centre core (Falcon 9 first stages), Falcon 9 second stage'] ]},
+      { title:'Career', rows:[ ['First flight', '6 February 2018, Kennedy Space Center'], ['Launch site', 'Kennedy Space Center (LC-39A)'] ]},
+      { title:'Capabilities', rows:[ ['Low Earth orbit (28.5°)', '63.8 t without recovery'], ['Geostationary transfer orbit', '26.7 t without recovery; 8 t with all three cores recovered'], ['To Mars', '16.8 t'] ]}
+    ]
+  },
+  sls:{
+    agency:'NASA; Boeing (core stage), Northrop Grumman (boosters)',
+    desc:'NASA\'s Moon rocket, for the Artemis programme. It launched the Orion capsule around the Moon without a crew on 16 November 2022 (Artemis I), then with four astronauts in April 2026 (Artemis II). Its four RS-25 engines flew on the Space Shuttle, as did its two solid boosters, lengthened by one segment.',
+    refs:{ nasa1b:'SLS (Space Launch System) Block 1B (reference page, comparison with Block 1)', wp:'Space Launch System (encyclopedia article, infobox figures)' },
+    model:{ license:'CC BY 4.0', note:'Model grouped by element and lightened for this site (reduced textures). Scaled to 98.3 m tall.' },
+    parts:{
+      srb:{ name:'Two solid boosters', desc:'Five-segment boosters, derived from the Space Shuttle\'s (four segments); they provide most of the thrust during the first two minutes.', facts:['Thrust of both boosters at lift-off: 8.8 million pounds-force (≈ 39 MN)'] },
+      core:{ name:'Core stage', desc:'The largest stage NASA has built: liquid hydrogen and oxygen tanks feeding four RS-25 engines for just over eight minutes.', facts:['Height: 212 feet (≈ 64.6 m)', 'Burn: just over eight minutes'] },
+      rs25:{ name:'Four RS-25 engines', desc:'Liquid hydrogen and oxygen engines at the bottom of the core stage; those of the first flights flew on the Space Shuttle.', facts:['Core stage thrust: more than 2 million pounds-force'] },
+      icps:{ name:'ICPS upper stage (RL10 engine)', desc:'Interim cryogenic stage, derived from the Delta IV rocket\'s: it sends Orion to the Moon.', facts:['RL10 thrust: 24,750 pounds-force (≈ 110 kN)'] },
+      orion:{ name:'Orion capsule and service module', desc:'The crewed spacecraft, for four astronauts, with its European (ESA) service module and solar arrays.' },
+      las:{ name:'Launch abort tower', desc:'If something goes wrong at lift-off or during the climb, its solid motors pull the capsule away from the rocket. Jettisoned once the climb is safe.' }
+    },
+    sections:[
+      { title:'Launcher', rows:[ ['Height', '322.4 feet (98.3 m), crew version'], ['Lift-off mass', '5.7 million pounds (≈ 2,600 t)'], ['Lift-off thrust', '8.8 million pounds-force (≈ 39 MN)'], ['Stages', 'two solid boosters, core stage (four RS-25), ICPS upper stage'] ]},
+      { title:'Career', rows:[ ['First flight', '16 November 2022, Artemis I, Kennedy Space Center pad 39B'], ['First crewed flight', 'April 2026, Artemis II'] ]},
+      { title:'Capabilities', rows:[ ['To the Moon', 'more than 27 t'], ['Low Earth orbit (200 km, 28.5°)', '95 t'] ]}
+    ]
+  },
+  soyuz2:{
+    name:'Soyuz-2', short:'Soyuz',
+    model:{ license:'CC BY 4.0', note:'Model of a Soyuz-FG, Soyuz-2\'s predecessor (same layout, fairing for a crewed spacecraft), grouped by stage. Original size of the model: 49.5 m with its fairing.' },
+    agency:'Roscosmos; built by RKTs Progress',
+    desc:'The latest version of the Soyuz family, heir to the R-7 rocket that launched Sputnik in 1957 and Gagarin in 1961. Four cone-shaped boosters surround the core stage; all ignite on the ground. It launches crews and cargo ships to the International Space Station, and satellites from Baikonur, Plesetsk and Vostochny.',
+    refs:{ wp:'Soyuz-2 (encyclopedia article, infobox figures)' },
+    parts:{
+      blockb:{ name:'Four boosters (blocks B, V, G, D)', desc:'First stage: four conical kerosene and liquid-oxygen boosters, one RD-107A engine each.', facts:['Height: 19.6 m; diameter: 2.68 m', 'Thrust at sea level: 838.5 kN each', 'Burn time: 118 s'] },
+      blocka:{ name:'Core stage (block A)', desc:'Second stage, ignited on the ground together with the boosters; RD-108A engine.', facts:['Height: 27.1 m; diameter: 2.95 m', 'Thrust at sea level: 792.5 kN', 'Burn time: 286 s'] },
+      blocki:{ name:'Third stage (block I)', desc:'RD-0110 (Soyuz-2.1a) or RD-0124 (Soyuz-2.1b) engine, burning kerosene and liquid oxygen.', facts:['Height: 6.7 m; diameter: 2.66 m', 'Thrust: 298 kN (2.1a), 294.3 kN (2.1b)'] },
+      fregat:{ name:'Fregat stage (optional) and fairing', desc:'Re-ignitable fourth stage with storable propellants, for high orbits; under the fairing with the satellites.' }
+    },
+    sections:[
+      { title:'Launcher', rows:[ ['Height', '46.3 m'], ['Diameter', '2.95 m (core stage), 10.3 m with the boosters'], ['Lift-off mass', '312 t'], ['Stages', 'three, or four with Fregat'] ]},
+      { title:'Career', rows:[ ['First flight', 'Soyuz-2.1a: 8 November 2004; Soyuz-2.1b: 27 December 2006'], ['Launch sites', 'Baikonur, Plesetsk, Vostochny'] ]},
+      { title:'Capabilities', rows:[ ['Low Earth orbit (240 km, 51.6°, Baikonur)', 'Soyuz-2.1a: 7.43 t; Soyuz-2.1b: 8.67 t'], ['To the Moon', 'Soyuz-2.1b: 2.35 t'] ]}
+    ]
+  },
+  cz5:{
+    name:'Long March 5', short:'Long March 5',
+    model:{ license:'CC BY 4.0', note:'Model re-cut into stages for this site from the position of each face and the published stage lengths (tools/models/seg_cz5.js): the boundaries between stages are approximate. Scaled to 56.97 m tall.' },
+    agency:'CASC; built by CALT',
+    desc:'China\'s heavy launcher, in service since 2016 at the Wenchang centre on Hainan island. It launched the Tianwen-1 Mars probe, the Chang\'e 5 and Chang\'e 6 lunar missions and, in its 5B version, the modules of the Tiangong station.',
+    refs:{ wp:'Long March 5 (encyclopedia article, infobox figures)' },
+    parts:{
+      boosters:{ name:'Four CZ-5-300 boosters', desc:'Kerosene and liquid-oxygen boosters, two YF-100 engines each.', facts:['Height: 27.6 m; diameter: 3.35 m', 'Thrust at sea level: 2,400 kN each', 'Burn time: 173 s'] },
+      core:{ name:'CZ-5-500 first stage', desc:'Cryogenic liquid hydrogen and oxygen stage, two YF-77 engines.', facts:['Height: 33.16 m; diameter: 5 m', 'Propellants: 165.3 t', 'Burn time: 492 s'] },
+      stage2:{ name:'CZ-5-HO second stage', desc:'Cryogenic stage, two YF-75D engines; absent from the 5B version, which puts its payloads directly into low orbit.', facts:['Height: 11.54 m', 'Thrust: 176.72 kN', 'Burn time: 700 s'] },
+      fairing:{ name:'Fairing', desc:'5.2 m diameter fairing, in two lengths.', facts:['Length: 12.27 m or 20.5 m'] }
+    },
+    sections:[
+      { title:'Launcher', rows:[ ['Height', '56.97 m (63.2 m with the long fairing)'], ['Diameter', '5 m'], ['Lift-off mass', '851.8 t'], ['Lift-off thrust', '10,565 kN'], ['Stages', 'four boosters, two cryogenic stages; optional YZ-2 stage'] ]},
+      { title:'Career', rows:[ ['First flight', 'CZ-5: 3 November 2016; CZ-5B: 5 May 2020'], ['Launch site', 'Wenchang (Hainan), pad 1'] ]},
+      { title:'Capabilities', rows:[ ['Low Earth orbit (200 × 400 km)', '25 t (CZ-5B)'], ['Geostationary transfer orbit', '14 t'], ['To the Moon', '8.8 to 9.4 t'] ]}
+    ]
+  },
+  saturnv:{
+    name:'Saturn V', short:'Saturn V',
+    model:{ license:'CC BY 4.0', note:'Model re-cut into stages for this site from the height of each face and the published stage lengths (tools/models/cut.js): the boundaries between stages are approximate. Scaled to 111 m tall with the Apollo spacecraft.' },
+    agency:'NASA; stages built by Boeing, North American and Douglas',
+    desc:'The rocket of the Apollo programme, the most powerful ever put into service until the 2020s. Nine flights, from Apollo 8 to Apollo 17, carried 24 astronauts to the Moon. Its last flight launched Skylab, the first American space station, fitted out inside a Saturn V third stage.',
+    refs:{ wp:'Saturn V (encyclopedia article, infobox figures)' },
+    parts:{
+      sic:{ name:'S-IC first stage (five F-1 engines)', desc:'Kerosene and liquid-oxygen stage, built by Boeing.', facts:['Height: 42 m; diameter: 10 m', 'Thrust at sea level: 33,000 kN', 'Burn time: 150 s'] },
+      sii:{ name:'S-II second stage (five J-2 engines)', desc:'Liquid hydrogen and oxygen stage, built by North American.', facts:['Height: 24.87 m; diameter: 10 m', 'Thrust in vacuum: 4,400 kN', 'Burn time: 395 s'] },
+      sivb:{ name:'S-IVB third stage (one J-2 engine)', desc:'Liquid hydrogen and oxygen stage, built by Douglas. It fired twice: to reach Earth orbit, then to leave for the Moon.', facts:['Height: 17.86 m; diameter: 6.60 m', 'Thrust in vacuum: 1,000 kN', 'Burn time: 165 s then 312 s (two burns)'] },
+      apollo:{ name:'Apollo spacecraft and escape tower', desc:'At the top: the adapter that housed the lunar module, the service module, the crew capsule and the launch escape tower.' }
+    },
+    sections:[
+      { title:'Launcher', rows:[ ['Height', '111 m with the Apollo spacecraft'], ['Diameter', '10 m'], ['Lift-off mass', '2,822 to 2,965 t depending on the mission'], ['Lift-off thrust', '34.5 MN'], ['Stages', 'three'] ]},
+      { title:'Career', rows:[ ['First flight', '9 November 1967 (Apollo 4)'], ['Last flight', '14 May 1973 (Skylab)'], ['Flights', '13, of which 12 successful and one partial failure (Apollo 6)'], ['Launch site', 'Kennedy Space Center, Launch Complex 39'] ]},
+      { title:'Capabilities', rows:[ ['Low Earth orbit (185 km)', '140 t'], ['To the Moon', '43.5 t'] ]}
+    ]
+  },
+  shuttle:{
+    name:'Space Shuttle', short:'Shuttle',
+    model:{ license:'NASA (copyright-free)', note:'Uncoloured NASA model, set upright and grouped into three elements for this site. Scaled on the length of the external tank (47 m): the other lengths are approximate.' },
+    agency:'NASA; orbiter built by Rockwell, tank by Martin Marietta, boosters by Thiokol',
+    desc:'The first orbital vehicle designed for reuse: the orbiter and its crew glided back to a runway, and the solid boosters were recovered at sea; only the big orange tank was lost. Over thirty years it launched and repaired the Hubble telescope, launched Chandra, Galileo, Magellan and Ulysses, and assembled the International Space Station. Two accidents, Challenger in 1986 and Columbia in 2003, killed 14 astronauts.',
+    refs:{ wp:'Space Shuttle (encyclopedia article, infobox figures)' },
+    parts:{
+      srb:{ name:'Two solid rocket boosters', desc:'The largest solid motors of their time, recovered at sea under parachutes and refilled.', facts:['Thrust: 13 MN each', 'Burn time: 124 s'] },
+      et:{ name:'External tank', desc:'Large liquid hydrogen and oxygen tank that fed the orbiter\'s three engines; dropped just before orbit, it fell back into the ocean.', facts:['Diameter: 8.7 m'] },
+      orbiter:{ name:'Orbiter (three RS-25 engines)', desc:'The spaceplane, with the crew and an 18 m long payload bay. Its engines burned the external tank\'s hydrogen and oxygen throughout the climb.', facts:['Thrust at sea level: 1,750 kN per engine', 'Burn time: 480 s'] }
+    },
+    sections:[
+      { title:'Launcher', rows:[ ['Height', '56 m'], ['Diameter', '8.7 m (external tank)'], ['Lift-off mass', '2,030 t'], ['Elements', 'two solid boosters, an external tank, the orbiter and its three engines'] ]},
+      { title:'Career', rows:[ ['First flight', '12 April 1981 (STS-1)'], ['Last flight', '21 July 2011 (STS-135)'], ['Flights', '135, including two accidents (Challenger, 1986; Columbia, 2003)'], ['Launch sites', 'Kennedy Space Center, Complexes 39A and 39B'] ]},
+      { title:'Capabilities', rows:[ ['Low Earth orbit (204 km)', '27.5 t'], ['To the International Space Station', '16.05 t'], ['Geostationary transfer orbit', '4.94 t with the IUS stage'], ['Return to Earth', '14.4 t'] ]}
+    ]
+  },
+  delta2:{
+    name:'Delta II', short:'Delta II',
+    agency:'McDonnell Douglas, then Boeing, then United Launch Alliance',
+    desc:'NASA\'s medium launcher for science missions for thirty years, with 155 flights. Nine solid boosters usually surrounded its first stage. It launched the Mars rovers Spirit and Opportunity, the GRAIL lunar probes, and observatories such as WMAP and Fermi.',
+    refs:{ wp:'Delta II (encyclopedia article, infobox figures)' },
+    parts:{
+      stage1:{ name:'First stage (RS-27A engine)', desc:'Kerosene and liquid-oxygen stage, derived from the Thor missile.', facts:['Height: 26.1 m; diameter: 2.44 m', 'Thrust: 1,054 kN', 'Burn time: 260.5 s'] },
+      gem:{ name:'GEM 40 boosters (three, four or nine)', desc:'Solid boosters; with nine, six ignite on the ground and three in flight.', facts:['Height: 13 m; diameter: 1.02 m', 'Thrust: 499.2 kN each (ground-lit)', 'Burn time: 64 s'] },
+      stage2:{ name:'Delta-K second stage (AJ10-118K engine)', desc:'Storable-propellant stage, re-ignitable.', facts:['Height: 6 m; diameter: 2.44 m', 'Thrust: 43.6 kN', 'Burn time: 431 s'] },
+      fairing:{ name:'Fairing and Star 48B third stage (optional)', desc:'For interplanetary probes, a solid third stage was added under the fairing.', facts:['Star 48B: 66 kN for 87 s'] }
+    },
+    sections:[
+      { title:'Launcher', rows:[ ['Height', '38.9 m'], ['Diameter', '2.44 m'], ['Lift-off mass', '152 to 286.1 t depending on the version'], ['Stages', 'two or three, with three, four or nine solid boosters'] ]},
+      { title:'Career', rows:[ ['First flight', '14 February 1989'], ['Last flight', '15 September 2018 (ICESat-2)'], ['Flights', '155, of which 153 successful, one failure and one partial failure'], ['Launch sites', 'Cape Canaveral (SLC-17), Vandenberg (SLC-2W)'] ]},
+      { title:'Capabilities', rows:[ ['Low Earth orbit (28.7°)', '2.8 to 6.1 t depending on the version'], ['Sun-synchronous orbit', '1.65 to 3.18 t depending on the version'], ['Geostationary transfer orbit', '0.93 to 2.18 t depending on the version'] ]}
+    ]
+  },
+  atlas5:{
+    name:'Atlas V', short:'Atlas V',
+    model:{ license:'CC BY 4.0', note:'Model of version 551, re-cut for this site from the position of each face (tools/models/cut.js): the boundary between first stage and fairing is approximate. Scaled to 58.3 m tall.' },
+    agency:'United Launch Alliance (developed by Lockheed Martin)',
+    desc:'A very reliable American launcher, nearing retirement: its first stage uses a Russian RD-180 engine and its Centaur upper stage burns hydrogen. It launched Mars Reconnaissance Orbiter, New Horizons to Pluto, Juno to Jupiter, and the Curiosity and Perseverance rovers.',
+    refs:{ wp:'Atlas V (encyclopedia article, infobox figures and table of versions)' },
+    parts:{
+      ccb:{ name:'First stage (RD-180 engine)', desc:'The Common Core Booster, burning kerosene and liquid oxygen, with a two-chamber Russian engine.', facts:['Height: 32.46 m; diameter: 3.81 m', 'Thrust at sea level: 3,827 kN', 'Burn time: 253 s'] },
+      srb:{ name:'Solid boosters (zero to five)', desc:'The tens digit of the version name gives their number: version 551 has five.', facts:['AJ-60A: 17 m; 1.6 m in diameter', 'GEM 63 (since 2020): 20.1 m', 'Burn time: 94 s'] },
+      fairing:{ name:'Fairing and Centaur second stage', desc:'4.2 m fairing (4xx versions) or 5.4 m fairing (5xx versions); the large fairing also encloses the Centaur second stage, burning liquid hydrogen and oxygen with one or two RL10 engines.', facts:['5.4 m fairing: 20.7, 23.4 or 26.5 m long', 'Centaur: 12.68 m; diameter 3.05 m; 842 s (one RL10A)'] }
+    },
+    sections:[
+      { title:'Launcher', rows:[ ['Height', 'up to 58.3 m'], ['Diameter', '3.81 m'], ['Lift-off mass', '590 t (heaviest version)'], ['Stages', 'two, with zero to five solid boosters'] ]},
+      { title:'Career', rows:[ ['First flight', '21 August 2002'], ['Flights', '109, of which 108 successful and one partial failure'], ['Status', 'nearing retirement: eight rockets remained to be launched in April 2026'], ['Launch sites', 'Cape Canaveral (SLC-41), Vandenberg (SLC-3E, until 2022)'] ]},
+      { title:'Capabilities', rows:[ ['Low Earth orbit (28.7°)', '9.8 t (version 401) to 18.8 t (version 551)'], ['Geostationary transfer orbit', '4.75 t (version 401) to 8.9 t (version 551)'] ]}
+    ]
+  },
+  titan4:{
+    name:'Titan IV', short:'Titan IV',
+    model:{ license:'CC BY 4.0', note:'Model of a Titan IVB; only the assembled copy is kept (the original model also shows an exploded one). Re-cut into stages for this site from the position of each face (tools/models/cut.js): the boundaries between stages are approximate. Scaled to 62 m tall.' },
+    agency:'US Air Force; built by Martin Marietta, then Lockheed Martin',
+    desc:'The US Air Force\'s heavy launcher in the 1990s. Its two stages burned storable propellants, and two huge solid boosters helped at lift-off. Only one of its missions was not military: Cassini-Huygens, which left for Saturn in 1997.',
+    refs:{ wp:'Titan IV (encyclopedia article, infobox figures)' },
+    parts:{
+      srmu:{ name:'Two SRMU solid boosters (Titan IVB)', desc:'Composite-case boosters, ignited on the ground.', facts:['Thrust: 7.56 MN each', 'Burn time: 140 s'] },
+      stage1:{ name:'First stage (two LR87 engines)', desc:'Storable-propellant stage (nitrogen tetroxide and Aerozine 50), ignited in flight shortly before the boosters burn out.', facts:['Thrust: 2,438 kN', 'Burn time: 164 s'] },
+      stage2:{ name:'Second stage (LR91 engine)', desc:'Storable-propellant stage.', facts:['Thrust: 467 kN', 'Burn time: 223 s'] },
+      centaur:{ name:'Centaur stage and fairing', desc:'Optional liquid hydrogen and oxygen upper stage, under a 5.1 m diameter fairing.', facts:['Centaur: two RL10 engines, 147 kN, 625 s', 'Fairing: 5.1 m in diameter, 17 to 26 m long'] }
+    },
+    sections:[
+      { title:'Launcher', rows:[ ['Height', '50 to 62 m depending on the fairing'], ['Diameter', '3.05 m'], ['Lift-off mass', '943 t'], ['Stages', 'three to five, with two solid boosters'] ]},
+      { title:'Career', rows:[ ['First flight', 'Titan IVA: 14 June 1989; Titan IVB: 23 February 1997'], ['Last flight', '19 October 2005'], ['Flights', '39, of which 35 successful'], ['Launch sites', 'Cape Canaveral (SLC-40 and 41), Vandenberg (SLC-4E)'] ]},
+      { title:'Capabilities', rows:[ ['Low Earth orbit', '21.68 t'], ['Geostationary orbit (with Centaur)', '5.76 t'] ]}
+    ]
+  },
+  protonm:{
+    name:'Proton-M', short:'Proton-M',
+    model:{ license:'CC BY 4.0', note:'Model re-cut into stages for this site from the height of each face and the published stage lengths (tools/models/cut.js): the boundaries between stages are approximate. Scaled to 58.2 m tall.' },
+    agency:'Roscosmos; built by Khrunichev',
+    desc:'Russia\'s heavy launcher, a modernised version of the 1960s Proton. Its first stage is surrounded by six tanks and burns toxic but storable propellants. It has launched telecommunication satellites, International Space Station modules (Zvezda, Nauka) and probes to Mars.',
+    refs:{ wp:'Proton-M (encyclopedia article, infobox figures)' },
+    parts:{
+      stage1:{ name:'First stage (six RD-275M engines)', desc:'A central oxidiser tank surrounded by six fuel tanks, each carrying an engine.', facts:['Height: 21.18 m; diameter: 7.4 m', 'Thrust: 10,532 kN', 'Burn time: 108 s'] },
+      stage2:{ name:'Second stage (four engines)', desc:'Three RD-0210 engines and one RD-0211.', facts:['Height: 17.05 m; diameter: 4.1 m', 'Thrust: 2,399 kN', 'Burn time: 206 s'] },
+      stage3:{ name:'Third stage', desc:'Storable-propellant stage.', facts:['Height: 4.11 m; diameter: 4.1 m', 'Thrust: 613.8 kN', 'Burn time: 238 s'] },
+      breeze:{ name:'Breeze-M stage and fairing', desc:'Re-ignitable upper stage for high orbits, under a 4.35 m diameter fairing.', facts:['Breeze-M: 19.62 kN, up to 3,000 s of operation'] }
+    },
+    sections:[
+      { title:'Launcher', rows:[ ['Height', '58.2 m'], ['Diameter', '7.4 m'], ['Lift-off mass', '705 t'], ['Stages', 'three, or four with Breeze-M or Blok DM'] ]},
+      { title:'Career', rows:[ ['First flight', '7 April 2001'], ['Flights', '116, of which 105 successful (page checked on 26 November 2026)'], ['Launch site', 'Baikonur'] ]},
+      { title:'Capabilities', rows:[ ['Low Earth orbit', '23 t'], ['Geostationary transfer orbit', '6.92 t (with Breeze-M)'], ['Geostationary orbit', '3.25 t'] ]}
+    ]
+  },
+  h2a:{
+    name:'H-IIA', short:'H-IIA',
+    model:{ license:'CC BY 4.0', note:'Model grouped by stage for this site; original height: 53 m.' },
+    agency:'JAXA and Mitsubishi Heavy Industries',
+    desc:'Japan\'s main launcher for nearly 25 years, flown from Tanegashima. Both its stages burn liquid hydrogen and oxygen. It launched the Kaguya lunar probe, the Akatsuki Venus probe and Hayabusa2, which brought back samples of the asteroid Ryugu. Its successor is H3.',
+    refs:{ wp:'H-IIA (encyclopedia article, infobox figures)' },
+    parts:{
+      stage1:{ name:'First stage (LE-7A engine)', desc:'Liquid hydrogen and oxygen stage.', facts:['Height: 37.2 m; diameter: 4 m', 'Thrust: 1,098 kN', 'Burn time: 390 s'] },
+      srb:{ name:'SRB-A solid boosters (two or four)', desc:'Version 202 has two, version 204 four.', facts:['Height: 15.1 m; diameter: 2.5 m', 'Thrust: 2,260 kN each', 'Burn time: 120 s'] },
+      stage2:{ name:'Second stage (LE-5B engine)', desc:'Liquid hydrogen and oxygen stage, re-ignitable.', facts:['Height: 9.2 m; diameter: 4 m', 'Thrust: 137 kN', 'Burn time: 534 s'] },
+      fairing:{ name:'Fairing', desc:'4 m diameter fairing, which encloses the top of the second stage.' }
+    },
+    sections:[
+      { title:'Launcher', rows:[ ['Height', '53 m'], ['Diameter', '4 m'], ['Lift-off mass', '285 t (version 202) to 445 t'], ['Stages', 'two, with two or four solid boosters'] ]},
+      { title:'Career', rows:[ ['First flight', '29 August 2001'], ['Last flight', '28 June 2025 (50th flight)'], ['Flights', '50, of which 49 successful'], ['Launch site', 'Tanegashima'] ]},
+      { title:'Capabilities', rows:[ ['Low Earth orbit', '10 to 15 t depending on the version'], ['Geostationary transfer orbit', '4.1 t (version 202) to 6 t (version 204)'] ]}
+    ]
+  },
+  pslv:{
+    name:'PSLV', short:'PSLV',
+    model:{ license:'CC BY 4.0', note:'Model of flight PSLV-C40 (XL version), without its stand, re-cut into stages for this site from the position of each face (tools/models/cut.js): the boundaries between stages are approximate. Scaled to 44 m tall.' },
+    agency:'ISRO (Indian Space Research Organisation)',
+    desc:'India\'s workhorse launcher, flown from Sriharikota. Its four stages alternate solid and liquid propellants, and six small boosters surround the first stage in the XL version. It launched Chandrayaan-1, India\'s first lunar probe, the Mangalyaan Mars probe and the Aditya-L1 solar observatory.',
+    refs:{ wp:'Polar Satellite Launch Vehicle (encyclopedia article, infobox figures)' },
+    parts:{
+      ps1:{ name:'PS1 first stage (S139 solid motor)', desc:'One of the largest solid motors in the world.', facts:['Height: 20 m; diameter: 2.8 m', 'Thrust: 4,846.9 kN', 'Burn time: 110 s'] },
+      psom:{ name:'Six PSOM-XL boosters', desc:'Solid boosters of the XL version.', facts:['Height: 12 m; diameter: 1 m', 'Thrust: 703.5 kN each', 'Burn time: 70 s'] },
+      ps2:{ name:'PS2 second stage (Vikas engine)', desc:'Storable liquid-propellant stage.', facts:['Height: 12.8 m; diameter: 2.8 m', 'Thrust: 803.7 kN', 'Burn time: 151 s'] },
+      ps3:{ name:'PS3 third stage (solid)', desc:'Solid stage.', facts:['Height: 3.6 m; diameter: 2 m', 'Thrust: 250 kN'] },
+      ps4:{ name:'PS4 fourth stage and fairing', desc:'Small liquid-propellant stage with two engines, under the fairing with the satellites.', facts:['PS4: height 3 m; diameter 1.3 m; 525 s'] }
+    },
+    sections:[
+      { title:'Launcher', rows:[ ['Height', '44 m'], ['Diameter', '2.8 m'], ['Lift-off mass', '320 t (PSLV-XL)'], ['Stages', 'four, with zero, two, four or six solid boosters depending on the version'] ]},
+      { title:'Career', rows:[ ['First flight', '20 September 1993; XL version: 22 October 2008'], ['Flights', '64, of which 59 successful (page checked on 26 November 2026)'], ['Launch site', 'Satish Dhawan Space Centre, Sriharikota'] ]},
+      { title:'Capabilities', rows:[ ['Low Earth orbit (200 km, 30°)', '3.8 t (PSLV-XL)'], ['Sun-synchronous orbit (620 km)', '1.75 t (PSLV-XL)'], ['Geostationary transfer orbit', '1.3 t (PSLV-XL)'] ]}
+    ]
+  },
+  vega:{
+    name:'Vega', short:'Vega',
+    agency:'Arianespace for ESA and ASI; built by Avio',
+    desc:'Europe\'s small launcher, flown from Kourou from 2012 to 2024 and replaced by Vega-C. Three solid stages and a small re-ignitable upper stage, AVUM, which drops satellites off one by one. It launched LISA Pathfinder in 2015 and several Copernicus Sentinel satellites.',
+    refs:{ wp:'Vega (rocket) (encyclopedia article, infobox figures)' },
+    parts:{
+      p80:{ name:'P80 first stage', desc:'Solid motor with a carbon-fibre case.', facts:['Height: 11.7 m; diameter: 3 m', 'Thrust: 2,261 kN', 'Burn time: 107 s'] },
+      z23:{ name:'Zefiro 23 second stage', desc:'Solid motor.', facts:['Height: 8.39 m; diameter: 1.9 m', 'Thrust: 871 kN', 'Burn time: 71.6 s'] },
+      z9:{ name:'Zefiro 9 third stage', desc:'Solid motor.', facts:['Height: 4.12 m; diameter: 1.9 m', 'Thrust: 260 kN', 'Burn time: 117 s'] },
+      avum:{ name:'AVUM stage and fairing', desc:'Liquid-propellant stage, re-ignitable up to five times, under a 2.6 m diameter fairing.', facts:['AVUM: 2.45 kN, up to 612.5 s', 'Fairing: 7.8 m tall'] }
+    },
+    sections:[
+      { title:'Launcher', rows:[ ['Height', '30 m'], ['Diameter', '3 m'], ['Lift-off mass', '137 t'], ['Stages', 'three solid and one AVUM liquid stage'] ]},
+      { title:'Career', rows:[ ['First flight', '13 February 2012'], ['Last flight', '5 September 2024 (Sentinel-2C)'], ['Flights', '22, of which 20 successful'], ['Launch site', 'Kourou (Vega launch complex)'] ]},
+      { title:'Capabilities', rows:[ ['Polar orbit (700 km)', '1.43 t'], ['Sun-synchronous orbit (400 km)', '1.45 t'] ]}
+    ]
+  },
+  starship:{
+    name:'Starship', short:'Starship',
+    model:{ license:'CC BY 4.0', note:'Model of the Block 3 version, grouped into two stages and lightened for this site. Scaled to 124.4 m tall (Block 3).' },
+    agency:'SpaceX',
+    desc:'The largest launcher ever built, still in development. Its two stages, the Super Heavy booster and the Starship vehicle, burn liquid methane and oxygen and are meant to be fully reusable: the booster returns to be caught by the launch tower, a first achieved on 13 October 2024. Thirteen test flights had taken place at the date of this page.',
+    refs:{ wp:'SpaceX Starship (encyclopedia article, infobox figures)' },
+    parts:{
+      booster:{ name:'Super Heavy booster (33 Raptor engines)', desc:'Methane and liquid-oxygen first stage, designed to return above the launch pad.', facts:['Height: 71 m (Block 1 and 2); diameter: 9 m', 'Propellants: 3,250 t (Block 2)'] },
+      ship:{ name:'Starship vehicle (six Raptor engines)', desc:'Second stage and spacecraft, with three engines for the atmosphere and three for vacuum.', facts:['Height: 52.1 m (Block 2); diameter: 9 m', 'Propellants: 1,500 t (Block 2)'] }
+    },
+    sections:[
+      { title:'Launcher', rows:[ ['Height', '121.3 m (Block 1), 123.1 m (Block 2), 124.4 m (Block 3)'], ['Diameter', '9 m'], ['Lift-off mass', 'about 5,000 t'], ['Stages', 'two, reusable'] ]},
+      { title:'Career', rows:[ ['First flight', '20 April 2023'], ['Test flights', '13 by 24 July 2026, of which 8 successful'], ['Status', 'in development'], ['Launch site', 'Starbase (Texas)'] ]},
+      { title:'Capabilities (targets)', rows:[ ['Low Earth orbit', 'Block 2: 35 t; Block 3: 100 t; baseline reusable version: 100 to 150 t'], ['Geostationary transfer orbit', '27 t (baseline reusable version)'] ]}
+    ]
+  }
+};
+
+/* Textes d'interface en anglais : EN_UI['texte français'] = 'English text' (appliqué par socle/page/i18n.js, OBS_T). */
+var EN_UI = {
+  "Lanceurs":"Launchers", "Lanceur":"Launcher", "Comparer":"Compare", "Flotte":"Fleet", "Vues d'ensemble":"Overviews",
+  "Page d'accueil des sites":"Home page of the sites", "Passer au thème clair":"Switch to light theme", "Passer au thème sombre":"Switch to dark theme",
+  "Fiche":"Facts", "Étages":"Stages", "Contenu du panneau":"Panel content", "Affichage":"Display",
+  "Éclater":"Explode", "Écarter les étages":"Move the stages apart", "Recadrer":"Reframe", "Pause":"Pause",
+  "Vue 3D du lanceur":"3D view of the launcher",
+  "Glisser pour tourner, molette pour zoomer":"Drag to rotate, scroll to zoom",
+  "Glisser pour tourner, molette pour zoomer, cliquer un étage pour l'identifier":"Drag to rotate, scroll to zoom, click a stage to identify it",
+  "Chargement de la maquette…":"Loading the model…", "La maquette n'a pas pu être chargée.":"The model could not be loaded.",
+  "La vue 3D demande WebGL, indisponible ici. La fiche reste lisible à droite.":"The 3D view needs WebGL, which is unavailable here. The facts remain readable on the right.",
+  "Maquette":"Model", "Licence":"Licence", "registre des crédits":"credits register",
+  "Pas encore de maquette 3D libre de droits pour ce lanceur : il est figuré par un point. Sa silhouette est dans « Comparer ».":"No freely licensed 3D model for this launcher yet: it is shown as a dot. Its silhouette is under “Compare”.",
+  "Valeurs vérifiées le":"Values checked on", "« ≈ » : valeur approchée.":"“≈”: approximate value.",
+  "Tous les lanceurs à la même échelle, et leurs capacités.":"All launchers at the same scale, and their capabilities.",
+  "Lanceurs à la même échelle":"Launchers at the same scale",
+  "Les lanceurs côte à côte, à la même échelle. Cliquer une silhouette ouvre la vue 3D du lanceur.":"The launchers side by side, at the same scale. Click a silhouette to open the launcher's 3D view.",
+  "Trait jaune à gauche : une personne de 1,8 m.":"Yellow line on the left: a 1.8 m tall person.",
+  "Silhouettes simplifiées (schéma) : hauteur totale et diamètres publiés, longueurs d'étages approchées, deux propulseurs d'appoint dessinés même quand il y en a quatre. Version la plus haute de chaque lanceur.":"Simplified silhouettes (diagram): published total height and diameters, approximate stage lengths, two boosters drawn even when there are four. Tallest version of each launcher.",
+  "Dimensions":"Dimensions", "Hauteur":"Height", "Diamètre":"Diameter", "Masse au décollage":"Lift-off mass", "Poussée au décollage":"Lift-off thrust",
+  "Capacités":"Capabilities", "Orbite basse":"Low Earth orbit", "Transfert géostationnaire":"Geostationary transfer", "Vers la Lune":"To the Moon",
+  "Masse utile maximale annoncée par le constructeur ou l'opérateur, pour l'orbite de référence indiquée sous chaque chiffre ; les orbites de référence diffèrent d'un lanceur à l'autre, donc les chiffres ne se comparent qu'en ordre de grandeur.":"Maximum payload announced by the builder or operator, for the reference orbit given under each figure; reference orbits differ from one launcher to another, so the figures only compare in order of magnitude.",
+  "Premier vol et période de service de chaque lanceur.":"First flight and service period of each launcher.",
+  "Frise des lanceurs, du premier vol à aujourd'hui ou au dernier vol":"Timeline of the launchers, from first flight to today or to the last flight",
+  "0,93 à 2,18 t selon la version":"0.93 to 2.18 t depending on the version",
+  "10 à 15 t selon la version":"10 to 15 t depending on the version",
+  "2,8 à 6,1 t selon la version (28,7°)":"2.8 to 6.1 t depending on the version (28.7°)",
+  "avec l'étage Breeze-M ; orbite à 1 800 m/s du géostationnaire":"with the Breeze-M stage; orbit 1,800 m/s short of geostationary",
+  "avec l'étage IUS emporté dans la soute":"with the IUS stage carried in the payload bay",
+  "objectif annoncé pour la version réutilisable (Block 3) ; 35 t pour la Block 2":"announced target for the reusable version (Block 3); 35 t for Block 2",
+  "objectif annoncé, version réutilisable":"announced target, reusable version",
+  "orbite polaire à 700 km":"polar orbit at 700 km",
+  "version 551 (cinq propulseurs, coiffe de 5 m)":"version 551 (five boosters, 5 m fairing)",
+  "Barre foncée : en service ; barre hachurée : en développement ; barre claire : retiré. Point orange : premier vol.":"Dark bar: in service; dashed outline: in development; light bar: retired. Orange dot: first flight.",
+  "Opérateur":"Operator", "Premier vol":"First flight", "Dernier vol":"Last flight", "État":"Status", "En service":"In service", "Retiré":"Retired", "En développement":"In development",
+  "Wikipédia (en)":"Wikipedia (en)",
+  /* notes des capacités (src/data-launchers.js, champ cap) */
+  "lancement double":"dual launch",
+  "premier étage non récupéré ; 17,5 t avec retour sur barge (28,5°)":"first stage expended; 17.5 t with a ship landing (28.5°)",
+  "premier étage non récupéré ; 5,5 t avec retour sur barge":"first stage expended; 5.5 t with a ship landing",
+  "sans récupération (28,5°)":"no recovery (28.5°)",
+  "sans récupération ; 8 t si les trois corps sont récupérés":"no recovery; 8 t with all three cores recovered",
+  "plus de 27 t vers la Lune (Orion comprise)":"more than 27 t to the Moon (Orion included)",
+  "200 km, 28,5°":"200 km, 28.5°",
+  "Soyouz-2.1b, 240 km, 51,6°, depuis Baïkonour":"Soyuz-2.1b, 240 km, 51.6°, from Baikonur",
+  "Soyouz-2.1b avec étage Fregat":"Soyuz-2.1b with Fregat stage",
+  "200 × 400 km":"200 × 400 km",
+  "8,8 à 9,4 t selon la source":"8.8 to 9.4 t depending on the source"
+};
+
+/* =================================================================
+   ANGLAIS — applique les textes de src/en/ quand OBS_LANG vaut « en ».
+   1. Contenu structuré (fiches des missions) : remplacé champ par champ avant le premier rendu.
+   2. Textes d'interface écrits dans le code ou dans body.html : traduits par dictionnaire (EN_UI).
+      Toute chaîne absente du dictionnaire reste en français : tools/i18n-scan.js liste ce qui manque.
+================================================================= */
+var OBS_T = function(s){ return s; }, OBS_I18N = { static:function(){} };
+(function(){
+  if (OBS_LANG !== 'en') return;
+  window.__i18nMiss = window.__i18nMiss || {};
+  MISSIONS.forEach(function(m){
+    var e = EN_MISSIONS[m.id]; if (!e) return;
+    var frSec = m.sections;
+    ['name','agency','desc','sections','targets'].forEach(function(k){ if (e[k]) m[k] = e[k]; });
+    (m.sections || []).forEach(function(sec, i){ sec.rows.forEach(function(r, j){ var o = frSec && frSec[i] && frSec[i].rows[j]; if (o && o[2]) r[2] = o[2]; }); });
+    if (e.refs) Object.keys(e.refs).forEach(function(k){ if (m.refs[k]) m.refs[k].t = e.refs[k]; });
+    if (e.model){ m.model.license = e.model.license; if (e.model.src) m.model.src = e.model.src; }
+    (m.parts || []).forEach(function(p){ var q = e.parts && e.parts[p.key]; if (!q) return; p.name = q.name; p.desc = q.desc; if (q.facts) p.facts = p.facts.map(function(f, j){ return [q.facts[j] || f[0], f[1]]; }); });
+  });
+  OBS_T = function(s){ if (EN_UI[s] != null) return EN_UI[s]; window.__i18nMiss[s] = 1; return s; };
+  /* body.html : attributs et textes fixes */
+  OBS_I18N.static = function(){
+    document.querySelectorAll('[aria-label],[title]').forEach(function(el){ ['aria-label','title'].forEach(function(a){ var v = el.getAttribute(a); if (v) el.setAttribute(a, OBS_T(v)); }); });
+    var h = document.querySelector('.home-link'); if (h) h.textContent = OBS_T(h.textContent);
+  };
+})();
+
+/* =================================================================
+   VUE 3D — maquette d'une sonde : rotation, zoom, pièces cliquables, vue éclatée.
+   Version allégée de la vue d'Observatories v1.0 (src/app.js là-bas) : même lecture des maquettes quantifiées
+   (positions converties en flottants pour le lancer de rayon), mêmes règles de surlignage.
+   Viewer.open(stageEl, mission, { onPick(key|null), onState(text) }) ; Viewer.select(key) ; Viewer.explode(0..1).
+================================================================= */
+var Viewer = (function(){
+'use strict';
+var REDUCED = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+var renderer = null, scene, camera, key, fill, hemi, loader, M = null, host = null, opts = {}, raf = 0, sel = null, hov = null, spin = !REDUCED, ex = 0;
+var C = { az:0.5, el:0.25, dist:20 };
+var models = {}, globe = null, globeFor = null, ring = null;
+/* corps survolé et orbite (schéma de principe) : le corps est au centre de la scène, la sonde tourne autour de lui sur une orbite circulaire,
+   côté instruments (nadir) toujours tourné vers le centre. Deux vues : « sonde » (caméra attachée à la sonde, le sol défile dessous) et
+   « orbite » (caméra loin du corps, sonde agrandie). Ni les tailles, ni l'altitude, ni la vitesse, ni l'inclinaison ne sont à l'échelle. */
+var O = { on:false, th:0.6, view:'probe', rb:1, inc:90, last:0, run:!REDUCED, k:1 }, carrier = null, sunDir = null;
+var V2 = { az:0.4, el:0.35, dist:5 };   /* caméra de la vue d'orbite, en rayons du corps */
+function setBody(t, R){
+  if (globe){ scene.remove(globe); globe = null; } if (ring){ scene.remove(ring); ring = null; }
+  var meta = t.body && (window.DATA_FILES || {})['tex-' + t.body.tex];
+  O.on = !!meta;
+  if (!meta) return false;
+  O.rb = R * 30; O.inc = t.body.inc == null ? 90 : t.body.inc; O.k = O.rb * 0.14 / R;
+  var tex = new THREE.TextureLoader().load('data/tex-' + t.body.tex + '.jpg'); tex.encoding = THREE.sRGBEncoding; tex.anisotropy = 4;
+  globe = new THREE.Mesh(new THREE.SphereGeometry(O.rb, 128, 64), new THREE.MeshStandardMaterial({ map:tex, color:0x9a9a9a, roughness:1, metalness:0 }));
+  scene.add(globe); globeFor = t.id;
+  /* trace de l'orbite, visible en vue d'orbite seulement */
+  var i = O.inc * Math.PI / 180, pts = [], ro = O.rb + R * O.k * 2.2;
+  for (var a = 0; a <= 128; a++){ var th = a / 128 * 2 * Math.PI; pts.push(new THREE.Vector3(Math.cos(th) * ro, Math.sin(th) * Math.sin(i) * ro, Math.sin(th) * Math.cos(i) * ro)); }
+  ring = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color:0x8fb8ff, transparent:true, opacity:0.55 }));
+  scene.add(ring);   /* à part du globe : le globe tourne, pas l'orbite */
+  return true;
+}
+/* repère de l'orbite au temps th : position p, direction du mouvement vel, verticale locale up */
+function orbitFrame(){
+  var i = O.inc * Math.PI / 180, u = new THREE.Vector3(1, 0, 0), v = new THREE.Vector3(0, Math.sin(i), Math.cos(i));
+  var up = u.clone().multiplyScalar(Math.cos(O.th)).addScaledVector(v, Math.sin(O.th));
+  var vel = u.clone().multiplyScalar(-Math.sin(O.th)).addScaledVector(v, Math.cos(O.th));
+  var alt = O.view === 'orbit' ? M.radius * O.k * 2.2 : M.radius * 2.4;
+  var q = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(vel, up, vel.clone().cross(up)));
+  return { p:up.clone().multiplyScalar(O.rb + alt), up:up, q:q };
+}
+
+function ok(){ return !!(window.THREE && THREE.GLTFLoader); }
+function init(){
+  if (renderer || !ok()) return !!renderer;
+  try { renderer = new THREE.WebGLRenderer({ antialias:true }); } catch(e){ renderer = null; return false; }
+  renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1)); renderer.outputEncoding = THREE.sRGBEncoding;
+  scene = new THREE.Scene(); camera = new THREE.PerspectiveCamera(35, 1, 0.05, 2000);
+  key = new THREE.DirectionalLight(0xffffff, 2.6); fill = new THREE.DirectionalLight(0x8fb0e8, 0.45); hemi = new THREE.HemisphereLight(0xffffff, 0x223344, 0.5);
+  scene.add(key, fill, hemi);
+  loader = new THREE.GLTFLoader();
+  var cv = renderer.domElement, drag = null;
+  cv.setAttribute('aria-hidden', 'true');
+  cv.addEventListener('pointerdown', function(e){ drag = { x:e.clientX, y:e.clientY, moved:false }; cv.setPointerCapture(e.pointerId); spin = false; });
+  cv.addEventListener('pointermove', function(e){
+    if (drag){ var dx = e.clientX - drag.x, dy = e.clientY - drag.y; if (Math.abs(dx) + Math.abs(dy) > 3) drag.moved = true;
+      var c = cam(); c.az -= dx * 0.008; c.el = Math.max(globe && O.view === 'probe' ? -0.3 : -1.4, Math.min(1.4, c.el + dy * 0.006)); drag.x = e.clientX; drag.y = e.clientY; cv.classList.add('dragging'); return; }
+    var k = pick(e); if (k !== hov){ hov = k; highlight(); cv.classList.toggle('over-part', !!k); }
+  });
+  cv.addEventListener('pointerup', function(e){ cv.classList.remove('dragging'); if (drag && !drag.moved){ var k = pick(e); select(sel === k ? null : k); if (opts.onPick) opts.onPick(sel); } drag = null; });
+  cv.addEventListener('pointerleave', function(){ if (hov){ hov = null; highlight(); } });
+  cv.addEventListener('wheel', function(e){ e.preventDefault(); if (!M) return; var f = 1 + Math.sign(e.deltaY) * 0.1;
+    if (cam() === V2) V2.dist = Math.max(1.6, Math.min(10, V2.dist * f)); else C.dist = Math.max(M.radius * 1.1, Math.min(M.radius * 8, C.dist * f)); }, { passive:false });
+  return true;
+}
+function cam(){ return O.on && O.view === 'orbit' ? V2 : C; }
+function pick(e){
+  if (!M) return null;
+  var r = renderer.domElement.getBoundingClientRect(), v = new THREE.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+  var rc = new THREE.Raycaster(); rc.setFromCamera(v, camera);
+  var hit = rc.intersectObjects(M.meshes, false)[0];
+  return hit ? hit.object.userData.part || null : null;
+}
+function prepare(t, gltf){
+  var inner = gltf.scene, root = new THREE.Group();
+  /* three r128 ne dénormalise pas les attributs entiers côté CPU (lancer de rayon, boîtes) : positions converties en flottants */
+  inner.traverse(function(o){
+    if (!o.isMesh) return; var g = o.geometry, pa = g.attributes.position;
+    if (!pa || !(pa.normalized || pa.isInterleavedBufferAttribute)) return;
+    var arr = pa.array || pa.data.array, nm = pa.normalized, den = arr instanceof Int16Array ? 32767 : arr instanceof Uint16Array ? 65535 : arr instanceof Int8Array ? 127 : arr instanceof Uint8Array ? 255 : 1;
+    var out = new Float32Array(pa.count * 3);
+    for (var i = 0; i < pa.count; i++){ var x = pa.getX(i), y = pa.getY(i), z = pa.getZ(i); if (nm){ x = Math.max(x/den, -1); y = Math.max(y/den, -1); z = Math.max(z/den, -1); } out[i*3] = x; out[i*3+1] = y; out[i*3+2] = z; }
+    g.setAttribute('position', new THREE.BufferAttribute(out, 3)); g.boundingBox = null; g.boundingSphere = null; g.computeBoundingSphere();
+  });
+  inner.updateMatrixWorld(true);
+  var box = new THREE.Box3().setFromObject(inner), size = box.getSize(new THREE.Vector3()), ctr = box.getCenter(new THREE.Vector3());
+  if (t.view && t.view.r){   /* longues antennes : on centre sur le module (pièce « bus ») plutôt que sur la boîte entière */
+    var bb = new THREE.Box3(); inner.traverse(function(o){ if (!o.isMesh) return; for (var p = o; p && p !== inner; p = p.parent) if (/^bus(_\d+)?$/.test(p.name || '')){ bb.expandByObject(o); return; } });
+    if (!bb.isEmpty()) bb.getCenter(ctr);
+  }
+  var s = t.unit || (t.axis ? t.size / size[t.axis] : 1);   /* unit : mètres par unité de la maquette ; sinon size le long de axis */
+  inner.scale.setScalar(s); inner.position.copy(ctr).multiplyScalar(-s); root.add(inner); root.updateMatrixWorld(true);
+  var R = { root:root, radius:(t.view && t.view.r) || size.length() * s / 2, meshes:[], parts:{} };   /* view.r : rayon de cadrage (antennes très longues exclues) */
+  t.parts.forEach(function(p){ R.parts[p.key] = { meshes:[], box:new THREE.Box3() }; });
+  inner.traverse(function(o){
+    if (!o.isMesh) return;
+    var k = null; for (var p = o; p && p !== root && !k; p = p.parent) if (R.parts[(p.name || '').replace(/_\d+$/, '')]) k = (p.name || '').replace(/_\d+$/, '');
+    o.material = o.material.clone(); o.material.side = THREE.DoubleSide; o.userData.part = k; R.meshes.push(o);
+    if (k){ R.parts[k].meshes.push(o); R.parts[k].box.expandByObject(o); }
+  });
+  /* vue éclatée : chaque pièce s'écarte du centre le long de la direction de son propre centre (schéma de principe) */
+  for (var k in R.parts){ var P = R.parts[k]; if (P.box.isEmpty()) continue;
+    var dir = P.box.getCenter(new THREE.Vector3()); if (dir.length() < R.radius * 0.15) dir.set(0, 0, 0); else dir.normalize().multiplyScalar(R.radius * 0.5);
+    P.meshes.forEach(function(o){ o.userData.base = o.position.clone(); o.userData.ex = dir.clone().divideScalar(s); }); }   /* nœuds de la maquette sans rotation propre (seg_lib.js) */
+  /* la maquette est tournée pour que le côté des instruments (nadir) regarde vers le bas : le corps survolé est toujours sous la sonde */
+  R.q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3().fromArray(t.body ? t.body.nadir : [0, -1, 0]).normalize(), new THREE.Vector3(0, -1, 0));
+  var top = new THREE.Group(); top.quaternion.copy(R.q); top.add(root); R.root = top;
+  return R;
+}
+/* sonde sans maquette libre de droits : un point lumineux à la couleur de surlignage (schéma de principe) */
+function placeholder(t){
+  var g = new THREE.Mesh(new THREE.SphereGeometry(0.6, 24, 16), new THREE.MeshBasicMaterial({ color:0x3D7BFF }));
+  var halo = new THREE.Mesh(new THREE.SphereGeometry(1.2, 24, 16), new THREE.MeshBasicMaterial({ color:0x8fb8ff, transparent:true, opacity:0.35, depthWrite:false }));
+  var top = new THREE.Group(); top.add(g, halo);
+  return { root:top, radius:(t.view && t.view.r) || 3, meshes:[], parts:{}, q:new THREE.Quaternion() };
+}
+function highlight(){
+  if (!M) return;
+  M.meshes.forEach(function(o){ var m = o.material, k = o.userData.part; if (!m.emissive) return;
+    if (m.userData.c0 === undefined){ m.userData.c0 = m.color.clone(); m.userData.e0 = m.emissive.clone(); }
+    m.emissive.copy(m.userData.e0); m.color.copy(m.userData.c0);
+    if (k && k === sel){ m.emissive.setHex(0xFF7A2F); m.emissiveIntensity = 0.35; }
+    else if (k && k === hov){ m.emissive.setHex(0xffffff); m.emissiveIntensity = 0.1; }
+    else if (sel) m.color.multiplyScalar(0.5); });
+}
+function resize(){ if (!host || !renderer) return; var w = host.clientWidth, h = host.clientHeight; renderer.setSize(w, h, false); camera.aspect = w / Math.max(1, h); camera.updateProjectionMatrix(); }
+function frame(now){
+  raf = requestAnimationFrame(frame);
+  if (!M || !host || !host.isConnected) return;
+  var dt = O.last ? Math.min(0.1, (now - O.last) / 1000) : 0; O.last = now;
+  M.meshes.forEach(function(o){ if (o.userData.base) o.position.copy(o.userData.base).addScaledVector(o.userData.ex, ex); });
+  if (!O.on){
+    if (spin) C.az += 0.0025;
+    carrier.position.set(0, 0, 0); carrier.quaternion.identity(); carrier.scale.setScalar(1);
+    var ce = Math.cos(C.el); camera.up.set(0, 1, 0); camera.position.set(Math.sin(C.az) * ce * C.dist, Math.sin(C.el) * C.dist, Math.cos(C.az) * ce * C.dist); camera.lookAt(0, 0, 0);
+    return renderer.render(scene, camera);
+  }
+  if (O.run) O.th += dt * 2 * Math.PI / (O.view === 'orbit' ? 40 : 120);   /* un tour en 2 min (vue sonde) ou 40 s (vue d'orbite) : accéléré */
+  if (O.run) globe.rotation.y += dt * 2 * Math.PI / 90;   /* le corps tourne aussi sur lui-même, vers l'est (un tour en 90 s : accéléré, schéma de principe) */
+  var F = orbitFrame(), big = O.view === 'orbit';
+  carrier.position.copy(F.p); carrier.quaternion.copy(F.q); carrier.scale.setScalar(big ? O.k : 1); ring.visible = big;
+  if (big){
+    var c2 = Math.cos(V2.el), d = V2.dist * O.rb; camera.up.set(0, 1, 0);
+    camera.position.set(Math.sin(V2.az) * c2 * d, Math.sin(V2.el) * d, Math.cos(V2.az) * c2 * d); camera.lookAt(0, 0, 0);
+  } else {
+    var ce2 = Math.cos(C.el), off = new THREE.Vector3(Math.sin(C.az) * ce2, Math.sin(C.el), Math.cos(C.az) * ce2).multiplyScalar(C.dist).applyQuaternion(F.q);
+    camera.up.copy(F.up); camera.position.copy(F.p).add(off); camera.lookAt(F.p);
+  }
+  renderer.render(scene, camera);
+}
+function open(el, t, o){
+  opts = o || {}; host = el;
+  if (!init()){ if (opts.onState) opts.onState('nogl'); return; }
+  el.insertBefore(renderer.domElement, el.firstChild); resize();
+  if (!raf) { window.addEventListener('resize', resize); frame(); }
+  sel = null; hov = null; ex = 0;
+  if (M && carrier) carrier.remove(M.root);
+  var show = function(R){ M = R; if (!carrier){ carrier = new THREE.Group(); scene.add(carrier); } carrier.add(M.root); C.az = t.view.az; C.el = t.view.el; C.dist = M.radius * 2 * t.view.dist;
+    var hasBody = setBody(t, M.radius); O.last = 0;
+    /* Soleil : direction fixe dans l'espace, surtout hors du plan de l'orbite pour que la sonde reste éclairée (schéma de principe) */
+    if (hasBody){ var i = O.inc * Math.PI / 180; sunDir = new THREE.Vector3(0.55, 0, 0).add(new THREE.Vector3(0, -Math.cos(i), Math.sin(i)).multiplyScalar(0.8)).add(new THREE.Vector3(0, 0.25, 0)).normalize(); key.position.copy(sunDir).multiplyScalar(O.rb * 4); fill.position.copy(sunDir).multiplyScalar(-O.rb * 4); }
+    else { key.position.fromArray(t.sun).applyQuaternion(M.q).multiplyScalar(M.radius * 4); fill.position.set(-0.6, -0.2, -0.5); }
+    highlight();
+    camera.near = M.radius * 0.02; camera.far = (hasBody ? O.rb * 20 : M.radius * 200); camera.updateProjectionMatrix();
+    if (opts.onState) opts.onState('ready', hasBody); };
+  if (models[t.id]) return show(models[t.id]);
+  if (!t.file) return show(models[t.id] = placeholder(t));
+  if (opts.onState) opts.onState('loading');
+  var url = t.file;
+  fetch(url).then(function(r){ if (!r.ok) throw new Error(r.status); return /\.txt$/.test(url) ? r.text().then(function(b){ var s = atob(b.trim()), a = new Uint8Array(s.length); for (var i = 0; i < s.length; i++) a[i] = s.charCodeAt(i); return a.buffer; }) : r.arrayBuffer(); })
+    .then(function(buf){ loader.parse(buf, '', function(g){ show(models[t.id] = prepare(t, g)); }, function(e){ if (opts.onState) opts.onState('error'); }); })
+    .catch(function(){ if (opts.onState) opts.onState('error'); });
+}
+function select(k){ sel = k || null; highlight(); }
+return { open:open, select:select, explode:function(v){ ex = v; }, spin:function(v){ spin = v && !REDUCED; },
+  reset:function(t){ if (M){ C.az = t.view.az; C.el = t.view.el; C.dist = M.radius * 2 * t.view.dist; V2.az = 0.4; V2.el = 0.35; V2.dist = 5; } },
+  view:function(v){ if (v) O.view = v; return O.view; }, run:function(v){ if (v != null){ O.run = !!v; spin = !!v && !REDUCED; } return O.run; },
+  hasOrbit:function(){ return O.on; }, available:ok };
+})();
+
+/* =================================================================
+   VUES D'ENSEMBLE — « Comparer » (silhouettes à l'échelle, dimensions, capacités) et « Flotte » (frise des lanceurs).
+   Tout part de MISSIONS (src/data-launchers.js) : dims, cap, sil, first, last, status.
+   Views.page(route) -> HTML ou null ; Views.mount(route) après insertion.
+================================================================= */
+var Views = (function(){
+'use strict';
+var T = function(s){ return OBS_T(s); };
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function n(v, d){ if (v == null) return '—'; var s = (d != null ? v.toFixed(d) : String(v)); return OBS_LANG === 'en' ? s : s.replace('.', ','); }
+function src(m, k){ var r = k && m.refs[k]; return r ? ' <a class="src" href="' + esc(r.u) + '" rel="noopener" target="_blank" title="' + esc(r.t) + '">' + esc(T(r.p)) + '</a>' : ''; }
+function approx(o){ return o && o.approx ? '≈ ' : ''; }
+
+/* ---------- silhouettes (schéma) ---------- */
+/* m.sil = { body:[{ d, h, k:'core'|'up'|'fair'|'cap', nose }], bst:{ n, d, h, nose }, side:{ d, h, y, nose } } : du bas vers le haut, en mètres.
+   nose : hauteur de la partie effilée en haut du segment (coiffe, tour de sauvetage, pointe des propulseurs). */
+function seg(x, y, w, h, nose, cls){
+  var top = y - h, nz = Math.min(nose || 0, h);
+  if (!nz) return '<rect class="' + cls + '" x="' + (x - w / 2).toFixed(1) + '" y="' + top.toFixed(1) + '" width="' + w.toFixed(1) + '" height="' + h.toFixed(1) + '"/>';
+  var yb = top + nz;
+  return '<path class="' + cls + '" d="M' + (x - w / 2).toFixed(1) + ' ' + y.toFixed(1) + 'V' + yb.toFixed(1) + 'Q' + (x - w / 2).toFixed(1) + ' ' + (top + nz * 0.25).toFixed(1) + ' ' + x.toFixed(1) + ' ' + top.toFixed(1) +
+    'Q' + (x + w / 2).toFixed(1) + ' ' + (top + nz * 0.25).toFixed(1) + ' ' + (x + w / 2).toFixed(1) + ' ' + yb.toFixed(1) + 'V' + y.toFixed(1) + 'Z"/>';
+}
+function silWidth(m){ var s = m.sil, w = 0; s.body.forEach(function(b){ w = Math.max(w, b.d); }); if (s.bst) w = Math.max(w, s.body[0].d + 2 * s.bst.d); if (s.side) w = Math.max(w, s.body[0].d + 2 * (s.side.d + (s.bst ? s.bst.d : 0))); return w; }
+function silhouette(m, cx, base, k){
+  var s = m.sil, out = '', y = base;
+  if (s.bst){ var off = (s.body[0].d + s.bst.d) / 2 * k;
+    out += seg(cx - off, base, s.bst.d * k, s.bst.h * k, (s.bst.nose || 0) * k, 'sil-bst') + seg(cx + off, base, s.bst.d * k, s.bst.h * k, (s.bst.nose || 0) * k, 'sil-bst'); }
+  /* side : élément accroché sur le côté (orbiteur de la navette), posé à side.y mètres du sol, dessiné de profil */
+  if (s.side){ var sx = cx + (s.body[0].d / 2 + (s.bst ? s.bst.d : 0) + s.side.d / 2) * k;
+    out += seg(sx, base - s.side.y * k, s.side.d * k, s.side.h * k, (s.side.nose || 0) * k, 'sil-cap'); }
+  s.body.forEach(function(b){ out += seg(cx, y, b.d * k, b.h * k, (b.nose || 0) * k, 'sil-' + b.k); y -= b.h * k; });
+  return out;
+}
+function comparer(){
+  var L = MISSIONS, H = 0; L.forEach(function(m){ H = Math.max(H, m.dims.h.v); });
+  var top = 34, bottom = 54, plotH = 440, k = plotH / (Math.ceil(H / 10) * 10), gap = 26, x = 70, cols = [];
+  L.forEach(function(m){ var w = Math.max(silWidth(m) * k, 60); cols.push({ m:m, x:x + w / 2, w:w }); x += w + gap; });
+  var human = 1.8, W = x + 40, base = top + plotH, g = '';
+  for (var hgt = 0; hgt <= H + 0.1; hgt += 10){ var yy = base - hgt * k; g += '<line class="gl" x1="40" x2="' + (W - 10) + '" y1="' + yy.toFixed(1) + '" y2="' + yy.toFixed(1) + '"/><text class="gt" x="36" y="' + (yy + 4).toFixed(1) + '" text-anchor="end">' + hgt + ' m</text>'; }
+  cols.forEach(function(c){
+    var m = c.m, h = m.dims.h.v * k;
+    g += '<a href="#' + m.id + '" aria-label="' + esc(m.name) + ', ' + n(m.dims.h.v) + ' m">' +
+      '<rect class="bx" x="' + (c.x - c.w / 2 - 4).toFixed(1) + '" y="' + (base - h - 4).toFixed(1) + '" width="' + (c.w + 8).toFixed(1) + '" height="' + (h + 40).toFixed(1) + '"/>' +
+      silhouette(m, c.x, base, k) +
+      '<text class="nm" x="' + c.x.toFixed(1) + '" y="' + (base + 18) + '" text-anchor="middle">' + esc(m.short) + '</text>' +
+      '<text class="hm" x="' + c.x.toFixed(1) + '" y="' + (base + 33) + '" text-anchor="middle">' + approx(m.dims.h) + n(m.dims.h.v) + ' m</text></a>';
+  });
+  /* silhouette humaine (1,8 m) à la même échelle, au pied de la grille */
+  var hx = 54, hh = human * k;
+  g += '<rect x="' + (hx - 0.6) + '" y="' + (base - hh).toFixed(1) + '" width="1.6" height="' + hh.toFixed(1) + '" fill="#FFD21F"/>';
+  var svg = '<svg viewBox="0 0 ' + W.toFixed(0) + ' ' + (base + bottom) + '" style="min-width:' + Math.round(W * 0.85) + 'px" role="group" aria-label="' + T('Lanceurs à la même échelle') + '"><desc>' +
+    L.map(function(m){ return esc(m.name) + ' ' + n(m.dims.h.v) + ' m'; }).join(', ') + '. ' + T('Trait jaune à gauche : une personne de 1,8 m.') + '</desc>' + g + '</svg>';
+  var dimRows = L.map(function(m){ var d = m.dims;
+    return '<tr><th scope="row"><a href="#' + m.id + '">' + esc(m.name) + '</a></th><td class="num">' + approx(d.h) + n(d.h.v) + ' m' + src(m, d.h.ref) + '</td><td class="num">' + approx(d.d) + n(d.d.v) + ' m' + src(m, d.d.ref) + '</td><td class="num">' + (d.mass ? approx(d.mass) + n(d.mass.v) + ' t' + src(m, d.mass.ref) : '—') + '</td><td class="num">' + (d.thrust ? approx(d.thrust) + n(d.thrust.v) + ' kN' + src(m, d.thrust.ref) : '—') + '</td></tr>'; }).join('');
+  var ORB = [['LEO', T('Orbite basse')], ['GTO', T('Transfert géostationnaire')], ['TLI', T('Vers la Lune')]];
+  var capRows = L.map(function(m){
+    return '<tr><th scope="row"><a href="#' + m.id + '">' + esc(m.name) + '</a></th>' + ORB.map(function(o){
+      var c = (m.cap || []).filter(function(x){ return x.o === o[0]; })[0];
+      return '<td class="num">' + (c ? approx(c) + n(c.t) + ' t' + src(m, c.ref) + (c.note ? '<small>' + esc(T(c.note)) + '</small>' : '') : '—') + '</td>';
+    }).join('') + '</tr>'; }).join('');
+  return '<div class="sk wide"><h2>' + T('Comparer') + '</h2>' +
+    '<p class="lead">' + T('Les lanceurs côte à côte, à la même échelle. Cliquer une silhouette ouvre la vue 3D du lanceur.') + '</p>' +
+    '<figure class="cmp-fig">' + svg + '</figure>' +
+    '<p class="note">' + T('Silhouettes simplifiées (schéma) : hauteur totale et diamètres publiés, longueurs d\'étages approchées, deux propulseurs d\'appoint dessinés même quand il y en a quatre. Version la plus haute de chaque lanceur.') + '</p>' +
+    '<h3>' + T('Dimensions') + '</h3><table class="sk-table cmp-tab"><thead><tr><th scope="col">' + T('Lanceur') + '</th><th scope="col" class="num">' + T('Hauteur') + '</th><th scope="col" class="num">' + T('Diamètre') + '</th><th scope="col" class="num">' + T('Masse au décollage') + '</th><th scope="col" class="num">' + T('Poussée au décollage') + '</th></tr></thead><tbody>' + dimRows + '</tbody></table>' +
+    '<h3>' + T('Capacités') + '</h3><table class="sk-table cmp-tab"><thead><tr><th scope="col">' + T('Lanceur') + '</th>' + ORB.map(function(o){ return '<th scope="col" class="num">' + o[1] + '</th>'; }).join('') + '</tr></thead><tbody>' + capRows + '</tbody></table>' +
+    '<p class="note">' + T('Masse utile maximale annoncée par le constructeur ou l\'opérateur, pour l\'orbite de référence indiquée sous chaque chiffre ; les orbites de référence diffèrent d\'un lanceur à l\'autre, donc les chiffres ne se comparent qu\'en ordre de grandeur.') + '</p></div>';
+}
+
+/* ---------- Flotte ---------- */
+function flotte(){
+  var L = MISSIONS.slice().sort(function(a, b){ return a.first < b.first ? -1 : 1; });
+  var y0 = Math.floor(Math.min.apply(null, L.map(function(m){ return +m.first.slice(0, 4); })) / 10) * 10, y1 = new Date().getUTCFullYear() + 1, W = 900, left = 150, right = 20, rowH = 40, top = 26;
+  var X = function(d){ var t = typeof d === 'string' ? (+d.slice(0, 4) + ((+d.slice(5, 7) || 1) - 1) / 12) : d; return left + (t - y0) / (y1 - y0) * (W - left - right); };
+  var H = top + L.length * rowH + 10, g = '';
+  for (var y = y0; y <= y1; y += (y1 - y0 > 40 ? 10 : 5)){ g += '<line class="fl-grid" x1="' + X(y).toFixed(1) + '" x2="' + X(y).toFixed(1) + '" y1="' + (top - 6) + '" y2="' + (H - 6) + '"/><text class="fl-year" x="' + X(y).toFixed(1) + '" y="' + (top - 10) + '" text-anchor="middle">' + y + '</text>'; }
+  var today = new Date().toISOString().slice(0, 10);
+  L.forEach(function(m, i){
+    var yy = top + i * rowH + 14, a = X(m.first), b = X(m.last || today);
+    g += '<a href="#' + m.id + '"><text class="fl-lab" x="' + (left - 10) + '" y="' + (yy + 4) + '" text-anchor="end">' + esc(m.short) + '</text></a>' +
+      '<rect class="fl-bar' + (m.last ? ' off' : m.status === 'dev' ? ' dev' : '') + '" x="' + a.toFixed(1) + '" y="' + (yy - 5) + '" width="' + Math.max(2, b - a).toFixed(1) + '" height="10"><title>' + esc(m.name) + '</title></rect>' +
+      '<circle class="fl-mark" cx="' + a.toFixed(1) + '" cy="' + yy + '" r="5"/>';
+  });
+  var rows = L.map(function(m){ var st = m.last ? T('Retiré') : m.status === 'dev' ? T('En développement') : T('En service');
+    return '<tr><th scope="row"><a href="#' + m.id + '">' + esc(m.name) + '</a></th><td>' + esc(m.agency) + '</td><td>' + esc(m.first) + src(m, m.firstRef) + '</td><td>' + (m.last ? esc(m.last) + src(m, m.lastRef) : '—') + '</td><td>' + st + '</td></tr>'; }).join('');
+  return '<div class="sk wide"><h2>' + T('Flotte') + '</h2><p class="lead">' + T('Premier vol et période de service de chaque lanceur.') + '</p>' +
+    '<figure class="fl-fig"><svg viewBox="0 0 ' + W + ' ' + H + '" role="group" aria-label="' + T('Frise des lanceurs, du premier vol à aujourd\'hui ou au dernier vol') + '">' + g + '</svg></figure>' +
+    '<p class="note">' + T('Barre foncée : en service ; barre hachurée : en développement ; barre claire : retiré. Point orange : premier vol.') + '</p>' +
+    '<table class="sk-table cmp-tab"><thead><tr><th scope="col">' + T('Lanceur') + '</th><th scope="col">' + T('Opérateur') + '</th><th scope="col">' + T('Premier vol') + '</th><th scope="col">' + T('Dernier vol') + '</th><th scope="col">' + T('État') + '</th></tr></thead><tbody>' + rows + '</tbody></table></div>';
+}
+
+var PAGES = { comparer:comparer, flotte:flotte };
+return {
+  page:function(r){ return PAGES[r] ? PAGES[r]() : null; },
+  mount:function(){}
+};
+})();
+
+/* =================================================================
+   APPLICATION — en-tête, routage par ancre, page d'un lanceur (vue 3D + panneau).
+   Reprise d'EarthObservers (src/app.js) sans la Terre ni la page « Mission et données ». Rien ici n'est propre à un lanceur :
+   tout part de MISSIONS (src/data-launchers.js). Pages d'ensemble (Comparer, Flotte) : src/views.js.
+================================================================= */
+(function(){
+'use strict';
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+/* titre et maison de l'en-tête : page d'accueil commune des sites (https://rolgim.github.io/), dans la même langue */
+document.querySelectorAll('.hub-link, .home-link').forEach(function(a){ a.href = 'https://rolgim.github.io/#' + OBS_LANG; });
+function launcher(id){ for (var i = 0; i < MISSIONS.length; i++) if (MISSIONS[i].id === id) return MISSIONS[i]; return null; }
+var T = OBS_T;
+/* anglais : nom court et note de la maquette (champs que socle/page/i18n.js ne reprend pas) */
+if (OBS_LANG === 'en') MISSIONS.forEach(function(m){ var e = EN_MISSIONS[m.id] || {}; if (e.short) m.short = e.short; if (e.model && e.model.note && m.model) m.model.note = e.model.note; });
+
+function isDark(){ var a = document.documentElement.getAttribute('data-theme'); return a ? a === 'dark' : !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches); }
+(function(){ try { var v = localStorage.getItem('ln-theme'); if (v === 'dark' || v === 'light') document.documentElement.setAttribute('data-theme', v); } catch(e){} })();
+
+/* vues d'ensemble : boutons fixes en haut à droite, même graisse quel que soit l'état */
+var VIEWS = [['lanceurs', 'Lanceurs'], ['comparer', 'Comparer'], ['flotte', 'Flotte']];
+function renderHeader(route){
+  var cur = launcher(route);
+  $('tabs').innerHTML = cur ? '<div class="trow" role="tablist" aria-label="' + T('Lanceur') + '">' + MISSIONS.map(function(m){
+    return '<button class="tab" role="tab" data-go="' + m.id + '" aria-selected="' + (m.id === cur.id) + '">' + esc(m.short || m.name) + '<small>' + esc(m.year || '') + '</small></button>';
+  }).join('') + '</div>' : '';
+  $('views').innerHTML = '<div class="views">' + VIEWS.map(function(v){
+    var on = route === v[0] || (v[0] === 'lanceurs' && cur);
+    return '<button class="vbtn" data-go="' + v[0] + '" aria-pressed="' + !!on + '">' + T(v[1]) + '</button>';
+  }).join('') + '</div>';
+  var ll = OBS_LANG === 'en' ? 'Lire en français' : 'Read in English';
+  var h = '<button class="tab util lang" id="b-lang" title="' + ll + '" aria-label="' + ll + '" lang="' + (OBS_LANG === 'en' ? 'fr' : 'en') + '"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="10" cy="10" r="7.6"/><path d="M2.4 10h15.2M10 2.4c2.2 2.1 3.3 4.6 3.3 7.6s-1.1 5.5-3.3 7.6M10 2.4C7.8 4.5 6.7 7 6.7 10s1.1 5.5 3.3 7.6"/></svg><span>' + (OBS_LANG === 'en' ? 'FR' : 'EN') + '</span></button>';
+  var dk = isDark(), lab = T(dk ? 'Passer au thème clair' : 'Passer au thème sombre');
+  h += '<button class="tab util theme" id="b-theme" title="' + lab + '" aria-label="' + lab + '"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">' +
+       (dk ? '<circle cx="10" cy="10" r="3.6"/><path d="M10 1.8v2.2M10 16v2.2M1.8 10H4M16 10h2.2M4.2 4.2l1.6 1.6M14.2 14.2l1.6 1.6M4.2 15.8l1.6-1.6M14.2 5.8l1.6-1.6"/>'
+           : '<path d="M16.6 12.1A7 7 0 0 1 7.9 3.4a7 7 0 1 0 8.7 8.7z" stroke-linejoin="round"/>') + '</svg></button>';
+  $('utils').innerHTML = h;
+}
+
+/* ---------- page d'un lanceur ---------- */
+var CREDITS_URL = 'https://github.com/Rolgim/Launchers/blob/main/CREDITS.md';
+function src(m, k){
+  var r = k && m.refs && m.refs[k];
+  return r ? ' <a class="src" href="' + esc(r.u) + '" rel="noopener" target="_blank" title="' + esc(r.t) + '">' + esc(T(r.p)) + '</a>' : '';
+}
+function fiche(m){
+  var h = '<p class="desc">' + esc(m.desc || '') + '</p>';
+  (m.sections || []).forEach(function(sec){
+    h += '<h3>' + esc(sec.title) + '</h3><table class="sk-table"><tbody>' + sec.rows.map(function(r){
+      return '<tr><th scope="row">' + esc(r[0]) + '</th><td>' + esc(OBS_NUM(r[1])) + src(m, r[2]) + '</td></tr>';
+    }).join('') + '</tbody></table>';
+  });
+  return h + '<p class="note">' + T('Valeurs vérifiées le') + ' ' + esc(m.checked) + '. ' + T('« ≈ » : valeur approchée.') + '</p>' +
+    '<button class="cta" data-go="comparer">' + T('Comparer') + '<small>' + T('Tous les lanceurs à la même échelle, et leurs capacités.') + '</small></button>';
+}
+function partsHtml(m, sel){
+  return '<ul class="parts">' + m.parts.map(function(p){
+    var on = p.key === sel;
+    return '<li class="part' + (on ? ' on' : '') + '"><button data-part="' + p.key + '" aria-expanded="' + on + '">' + esc(p.name) + '</button>' +
+      (on ? '<div class="part-body"><p>' + esc(p.desc) + '</p>' + (p.facts.length ? '<ul>' + p.facts.map(function(f){ return '<li>' + esc(OBS_NUM(f[0])) + src(m, f[1]) + '</li>'; }).join('') + '</ul>' : '') + '</div>' : '') + '</li>';
+  }).join('') + '</ul>' + modelNote(m);
+}
+function modelNote(m){
+  return m.file ? '<p class="note">' + T('Maquette') + ' : <a href="' + esc(m.model.u) + '" rel="noopener" target="_blank">' + esc(m.model.src) + '</a> · ' + T('Licence') + ' : ' + esc(m.model.license) + ' · <a href="' + CREDITS_URL + '" rel="noopener" target="_blank">' + T('registre des crédits') + '</a>' + (m.model.note ? '<br>' + esc(m.model.note) : '') + '</p>'
+    : '<p class="note">' + T('Pas encore de maquette 3D libre de droits pour ce lanceur : il est figuré par un point. Sa silhouette est dans « Comparer ».') + '</p>';
+}
+var MS = { tab:'fiche', part:null, explode:0, run:!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) };
+function launcherPage(m){
+  if (MS.mid !== m.id){ MS.part = null; MS.mid = m.id; }   /* l'étage choisi ne passe pas d'un lanceur à l'autre */
+  return '<div class="mission"><section id="stage" class="m-stage" aria-label="' + T('Vue 3D du lanceur') + '">' +
+    '<div class="m-hud"><div class="m-name">' + esc(m.name) + '</div><div class="m-sub">' + esc(m.agency) + '</div></div>' +
+    '<p class="m-msg" id="m-msg" hidden></p>' +
+    '<div class="m-tools" role="toolbar" aria-label="' + T('Affichage') + '">' +
+      (m.file ? '<label class="m-ex" title="' + T('Écarter les étages') + '">' + ICO.ex + '<span class="lbl">' + T('Éclater') + '</span><input id="m-explode" type="range" min="0" max="100" value="' + Math.round(MS.explode*100) + '" aria-label="' + T('Écarter les étages') + '"></label>' : '') +
+      '<button class="m-b" id="m-reset" title="' + T('Recadrer') + '">' + ICO.reset + '<span class="lbl">' + T('Recadrer') + '</span></button>' +
+      '<button class="m-b" id="m-run" aria-pressed="' + !MS.run + '" title="' + T('Pause') + '">' + ICO.pause + '<span class="lbl">' + T('Pause') + '</span></button></div>' +
+    '<p class="m-hint">' + T(m.file ? 'Glisser pour tourner, molette pour zoomer, cliquer un étage pour l\'identifier' : 'Glisser pour tourner, molette pour zoomer') + '</p>' +
+    '</section><aside class="m-panel"><h2 class="sr-only">' + esc(m.name) + '</h2>' +
+    '<div class="ptl-row"><div class="ptl" role="tablist" aria-label="' + T('Contenu du panneau') + '">' +
+      (m.parts.length ? ['fiche', 'parts'] : ['fiche']).map(function(k){ return '<button class="ptab" role="tab" data-ptab="' + k + '" aria-selected="' + (MS.tab === k) + '">' + T(k === 'fiche' ? 'Fiche' : 'Étages') + (k === 'parts' ? ' <small>' + m.parts.length + '</small>' : '') + '</button>'; }).join('') +
+    '</div></div><div id="m-body">' + (MS.tab === 'fiche' || !m.parts.length ? fiche(m) : partsHtml(m, MS.part)) + '</div></aside></div>';
+}
+/* icônes de la barre d'outils de la vue 3D (mêmes traits que celles d'Observatories) */
+var ICO = (function(){ function i(d){ return '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true" focusable="false">' + d + '</svg>'; }
+  return { ex:i('<rect x="5.5" y="5.5" width="5" height="5"/><path d="M8 3.6V1M8 15v-2.6M3.6 8H1M15 8h-2.6"/>'), reset:i('<path d="M1.5 5.5v-4h4M14.5 5.5v-4h-4M1.5 10.5v4h4M14.5 10.5v4h-4"/>'), pause:i('<path d="M5.5 3.5v9M10.5 3.5v9"/>') }; })();
+function mountLauncher(m){
+  var msg = $('m-msg');
+  if (!Viewer.available()){ msg.hidden = false; msg.textContent = T('La vue 3D demande WebGL, indisponible ici. La fiche reste lisible à droite.'); return; }
+  Viewer.open($('stage'), m, {
+    onPick:function(k){ MS.part = k; MS.tab = 'parts'; renderPanel(m); },
+    onState:function(st){ msg.hidden = st === 'ready'; msg.textContent = st === 'loading' ? T('Chargement de la maquette…') : st === 'nogl' ? T('La vue 3D demande WebGL, indisponible ici. La fiche reste lisible à droite.') : st === 'error' ? T('La maquette n\'a pas pu être chargée.') : ''; }
+  });
+  Viewer.select(MS.part); Viewer.explode(MS.explode); Viewer.run(MS.run);
+  if ($('m-explode')) $('m-explode').addEventListener('input', function(e){ MS.explode = e.target.value / 100; Viewer.explode(MS.explode); });
+  $('m-reset').addEventListener('click', function(){ Viewer.reset(m); });
+  /* pause : arrête la rotation (WCAG 2.2.2) */
+  $('m-run').addEventListener('click', function(e){ MS.run = !MS.run; Viewer.run(MS.run); e.currentTarget.setAttribute('aria-pressed', String(!MS.run)); });
+}
+function renderPanel(m){
+  if (!m.parts.length) MS.tab = 'fiche';
+  document.querySelectorAll('.m-panel [data-ptab]').forEach(function(b){ b.setAttribute('aria-selected', String(b.getAttribute('data-ptab') === MS.tab)); });
+  $('m-body').innerHTML = MS.tab === 'fiche' ? fiche(m) : partsHtml(m, MS.part);
+}
+
+function currentRoute(){ return (location.hash || '').replace(/^#/, '').replace(/^(en|fr)-/, ''); }
+function route(){
+  var r = currentRoute() || 'comparer';
+  if (r === 'lanceurs'){ r = window.LN_LAST || MISSIONS[0].id; history.replaceState(null, '', '#' + ((location.hash.match(/^#((?:en|fr)-)/) || [])[1] || '') + r); }   /* « Lanceurs » ouvre le dernier lanceur vu */
+  var m = launcher(r);
+  if (m) window.LN_LAST = m.id;
+  var xp = !m && Views.page(r);
+  if (!m && !xp){ r = 'comparer'; xp = Views.page(r); }
+  renderHeader(m ? m.id : r);
+  $('page').innerHTML = m ? launcherPage(m) : xp;
+  $('page').classList.toggle('is-mission', !!m);
+  if (m) mountLauncher(m); else Views.mount(r);
+  var h2 = $('page').querySelector('h2');
+  document.title = (h2 ? h2.textContent + ' · ' : '') + T('Lanceurs');
+  $('live').textContent = h2 ? h2.textContent : '';
+}
+
+document.addEventListener('click', function(e){
+  var el = e.target.closest ? e.target.closest('#b-lang,#b-theme,[data-go],[data-ptab],[data-part]') : null;
+  if (!el) return;
+  var cm = launcher(currentRoute());
+  if (el.hasAttribute('data-ptab') && cm){ MS.tab = el.getAttribute('data-ptab'); renderPanel(cm); return; }
+  if (el.hasAttribute('data-part') && cm){ var k = el.getAttribute('data-part'); MS.part = MS.part === k ? null : k; Viewer.select(MS.part); renderPanel(cm); var b = document.querySelector('[data-part="' + k + '"]'); if (b) b.focus(); return; }
+  if (el.id === 'b-lang'){ var nl = OBS_LANG === 'en' ? 'fr' : 'en'; try { localStorage.setItem('ln-lang', nl); } catch(x){} location.hash = nl + '-' + currentRoute(); location.reload(); return; }
+  if (el.id === 'b-theme'){ var nt = isDark() ? 'light' : 'dark'; document.documentElement.setAttribute('data-theme', nt); try { localStorage.setItem('ln-theme', nt); } catch(x){} route(); $('b-theme').focus(); return; }
+  if (el.tagName === 'A') return;
+  location.hash = el.getAttribute('data-go');
+});
+/* onglets des lanceurs : flèches gauche/droite, début, fin (motif « tablist ») */
+document.addEventListener('keydown', function(e){
+  var t = e.target.closest && e.target.closest('#tabs [role="tab"]'); if (!t) return;
+  var all = [].slice.call(document.querySelectorAll('#tabs [role="tab"]')), i = all.indexOf(t), n = all.length, j = -1;
+  if (e.key === 'ArrowRight') j = (i + 1) % n; else if (e.key === 'ArrowLeft') j = (i - 1 + n) % n; else if (e.key === 'Home') j = 0; else if (e.key === 'End') j = n - 1;
+  if (j < 0) return; e.preventDefault(); location.hash = all[j].getAttribute('data-go');
+  setTimeout(function(){ var a = document.querySelector('#tabs [aria-selected="true"]'); if (a) a.focus(); }, 0);
+});
+window.addEventListener('hashchange', route);
+OBS_I18N.static();
+route();
+window.__ln = { route:route, launcher:launcher };
+})();
+
+</script>
+</body>
+</html>

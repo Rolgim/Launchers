@@ -1,0 +1,6 @@
+__pycache__/
+tools/probe/_out/
+tools/models/node_modules
+dist/
+shots/
+socle/models/node_modules

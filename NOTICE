@@ -1,0 +1,8 @@
+Lanceurs (Launchers)
+Copyright 2026 Rolgim
+
+Ce produit contient du code sous licence Apache 2.0 (voir LICENSE).
+Les maquettes 3D affichées par le site (models/*.glb) ne sont PAS couvertes par cette licence :
+chacune garde la licence de sa source (Creative Commons Attribution 4.0 pour toutes, à ce jour), avec son auteur,
+listés dans CREDITS.md et écrits sous la vue 3D de chaque lanceur. Elles ont été modifiées pour ce site
+(regroupement par étage, couleurs, textures réduites, géométrie quantifiée ou simplifiée).
