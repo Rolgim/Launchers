@@ -37,5 +37,14 @@ node tools/credits.js
 
 Quand plusieurs étages partagent un même maillage, `tools/models/cut.js` les redécoupe face par face d'après la hauteur de chaque face
 et les longueurs publiées des étages (Longue Marche 5, Saturn V, Atlas V, Proton-M, Titan IV, PSLV : limites entre étages approchées, signalées dans la fiche).
-Une maquette couchée est d'abord redressée par `tools/models/rot.mjs`. Sans maquette libre convenable (Delta II et Vega pour l'instant),
+Une maquette couchée est d'abord redressée par `tools/models/rot.mjs`. Quand les couleurs de la source sont fausses ou trop sombres
+(métal sans reflets dans la vue 3D), `tools/models/paint.mjs` les retouche pièce par pièce, après la découpe (couleurs approchées) :
+
+```
+node tools/models/paint.mjs models/shuttle.glb '[["srb",{"c":[238,238,232]}],["et",{"c":[196,104,46],"rough":0.8}],["orbiter",{"c":[236,236,232]}]]'
+node tools/models/paint.mjs models/titan4.glb '[["*",{"c":[222,222,216]}]]'
+node tools/models/paint.mjs models/starship.glb '[["*",{"k":1.9,"metal":0.3}]]'
+node tools/models/paint.mjs models/falconheavy.glb '[["*",{"k":2.6,"metal":0.3}]]'
+```
+ Sans maquette libre convenable (Delta II et Vega pour l'instant),
 la vue 3D montre un point et la fiche reste complète.

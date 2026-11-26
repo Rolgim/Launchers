@@ -63,7 +63,7 @@
    "license_url": "https://creativecommons.org/licenses/by/4.0/",
    "credit": "Clarence365, Sketchfab",
    "fetched": "2026-11-26",
-   "transform": "téléchargée par l'API de Sketchfab (tools/probe/fetch_sketchfab.py), nœuds regroupés par étage, transformations figées, couleurs de base assombries pour l'éclairage du site, textures réduites à 512 px (JPEG), géométrie quantifiée (tools/models/prep.mjs) ; Maquette regroupée par étage et allégée pour ce site (textures réduites). Mise à l'échelle : 70 m de haut.",
+   "transform": "téléchargée par l'API de Sketchfab (tools/probe/fetch_sketchfab.py), nœuds regroupés par étage, transformations figées, couleurs de base assombries pour l'éclairage du site, textures réduites à 512 px (JPEG), géométrie quantifiée (tools/models/prep.mjs), couleurs retouchées pièce par pièce, approchées (tools/models/paint.mjs) ; Maquette regroupée par étage et allégée pour ce site (textures réduites). Mise à l'échelle : 70 m de haut.",
    "status": "ok"
   },
   {
@@ -128,7 +128,7 @@
    "license_url": null,
    "credit": "NASA, NASA 3D Resources (GitHub)",
    "fetched": "2026-11-26",
-   "transform": "téléchargée depuis le dépôt nasa/NASA-3D-Resources, redressée (tools/models/rot.mjs), nœuds regroupés par étage, transformations figées, couleurs de base assombries pour l'éclairage du site, textures réduites à 512 px (JPEG), géométrie quantifiée (tools/models/prep.mjs) ; Maquette sans couleurs de la NASA, redressée et regroupée en trois éléments pour ce site. Mise à l'échelle sur la longueur du réservoir externe (47 m) : les autres longueurs sont approchées.",
+   "transform": "téléchargée depuis le dépôt nasa/NASA-3D-Resources, redressée (tools/models/rot.mjs), nœuds regroupés par étage, transformations figées, couleurs de base assombries pour l'éclairage du site, textures réduites à 512 px (JPEG), géométrie quantifiée (tools/models/prep.mjs), couleurs retouchées pièce par pièce, approchées (tools/models/paint.mjs) ; Maquette sans couleurs de la NASA, redressée et regroupée en trois éléments pour ce site. Mise à l'échelle sur la longueur du réservoir externe (47 m) : les autres longueurs sont approchées.",
    "status": "ok"
   },
   {
@@ -154,7 +154,7 @@
    "license_url": "https://creativecommons.org/licenses/by/4.0/",
    "credit": "AllThingsSpace, Sketchfab",
    "fetched": "2026-11-26",
-   "transform": "téléchargée par l'API de Sketchfab (tools/probe/fetch_sketchfab.py), nœuds regroupés par étage, transformations figées, couleurs de base assombries pour l'éclairage du site, textures réduites à 512 px (JPEG), géométrie quantifiée (tools/models/prep.mjs) ; Maquette d'une Titan IVB ; seul l'exemplaire assemblé est gardé (la maquette d'origine en montre aussi un éclaté). Redécoupée en étages pour ce site d'après la position de chaque face (tools/models/cut.js) : les limites entre étages sont approchées. Mise à l'échelle : 62 m de haut.",
+   "transform": "téléchargée par l'API de Sketchfab (tools/probe/fetch_sketchfab.py), nœuds regroupés par étage, transformations figées, couleurs de base assombries pour l'éclairage du site, textures réduites à 512 px (JPEG), géométrie quantifiée (tools/models/prep.mjs), couleurs retouchées pièce par pièce, approchées (tools/models/paint.mjs) ; Maquette d'une Titan IVB ; seul l'exemplaire assemblé est gardé (la maquette d'origine en montre aussi un éclaté). Redécoupée en étages pour ce site d'après la position de chaque face (tools/models/cut.js) : les limites entre étages sont approchées. Mise à l'échelle : 62 m de haut.",
    "status": "ok"
   },
   {
@@ -206,7 +206,7 @@
    "license_url": "https://creativecommons.org/licenses/by/4.0/",
    "credit": "Clarence365, Sketchfab",
    "fetched": "2026-11-26",
-   "transform": "téléchargée par l'API de Sketchfab (tools/probe/fetch_sketchfab.py), nœuds regroupés par étage, transformations figées, couleurs de base assombries pour l'éclairage du site, textures réduites à 512 px (JPEG), géométrie quantifiée (tools/models/prep.mjs) ; Maquette de la version Block 3, regroupée en deux étages et allégée pour ce site. Mise à l'échelle : 124,4 m de haut (Block 3).",
+   "transform": "téléchargée par l'API de Sketchfab (tools/probe/fetch_sketchfab.py), nœuds regroupés par étage, transformations figées, couleurs de base assombries pour l'éclairage du site, textures réduites à 512 px (JPEG), géométrie quantifiée (tools/models/prep.mjs), couleurs retouchées pièce par pièce, approchées (tools/models/paint.mjs) ; Maquette de la version Block 3, regroupée en deux étages et allégée pour ce site. Mise à l'échelle : 124,4 m de haut (Block 3).",
    "status": "ok"
   },
   {

@@ -91,7 +91,14 @@ figure{ margin:0 0 10px; } figcaption{ font-size:12.5px; line-height:1.45; color
 
 /* ---------- Comparer : silhouettes à l'échelle (src/views.js) ---------- */
 .cmp-fig{ background:var(--black); padding:8px 0 0; overflow-x:auto; }
-.cmp-fig svg{ display:block; height:auto; min-width:640px; width:100%; font-family:var(--f); }
+.cmp-fig svg{ display:block; height:auto; width:100%; max-height:calc(100vh - 120px); font-family:var(--f); }
+.cmp-text{ max-width:960px; }
+.cmp-fig .gh{ stroke:#AEB5BA; stroke-width:1; }
+.cmp-fig .gn{ fill:#fff; font-size:13px; font-weight:800; letter-spacing:.3px; }
+.cmp-tab tr.grp th{ padding-top:14px; font-size:12px; text-transform:uppercase; letter-spacing:.4px; color:var(--ink); border-bottom:1.5px solid var(--ink); }
+.fl-grp{ font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.4px; fill:var(--ink); }
+.fl-gl{ stroke:var(--ink); stroke-width:1; }
+#tabs .tab.g0:not(:first-child){ margin-left:10px; }
 .cmp-fig .gl{ stroke:#3A4046; stroke-width:1; }
 .cmp-fig .gt{ fill:#AEB5BA; font-size:11px; }
 .cmp-fig .nm{ fill:#fff; font-size:12.5px; font-weight:700; }
