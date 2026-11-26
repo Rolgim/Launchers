@@ -1,0 +1,32 @@
+{
+  "name": "Launchers",
+  "langKey": "ln-lang",
+  "mark": "#C2410C",
+  "mark3d": "0xFF7A2F",
+  "title": "Launchers",
+  "artifactTitle": "Lanceurs",
+  "description": "Space launchers in 3D, stage by stage, compared at the same scale, with sourced facts. In English and French.",
+  "fonts": "<link rel=\"stylesheet\" href=\"https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500&display=swap\">",
+  "css": [
+    "socle:style.css",
+    "site.css"
+  ],
+  "registry": {
+    "file": "data-launchers.js",
+    "check": "var MISSIONS = \\["
+  },
+  "scripts": [
+    "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js",
+    "https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"
+  ],
+  "js": [
+    "socle:lang.js",
+    "@registry",
+    "en/launchers.js",
+    "en/ui.js",
+    "socle:i18n.js",
+    "socle:viewer.js",
+    "views.js",
+    "app.js"
+  ]
+}
