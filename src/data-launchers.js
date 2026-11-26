@@ -3,6 +3,7 @@
    Ajouter un lanceur = une entrée ici et ses textes anglais dans en/launchers.js ; app.js et views.js n'ont pas à changer.
    build.js et tools/pages.js lisent ce registre (une ligne « id:'…' » par lanceur, indentée de 4 espaces).
      id, name, short, year      identifiant (ancre #id), nom complet, nom court, année du premier vol
+     group                      famille d'affichage (pays ou région du lanceur) : eu, us, ru, cn, jp, in (ordre et noms : GROUPS dans views.js)
      agency                     constructeur et opérateur, en texte
      first, firstRef            date du premier vol (AAAA-MM-JJ) et sa source ; last, lastRef : dernier vol d'un lanceur retiré
      dims                       { h, d, mass } : hauteur (m), diamètre du corps central (m), masse au décollage (t) ;
@@ -19,7 +20,7 @@
 ================================================================= */
 var MISSIONS = [
   {
-    id:'ariane5', name:'Ariane 5 ECA', short:'Ariane 5', year:'1996',
+    id:'ariane5', name:'Ariane 5 ECA', short:'Ariane 5', year:'1996', group:'eu',
     agency:'ESA, ArianeGroup ; exploité par Arianespace',
     first:'1996-06-04', firstRef:'csg', last:'2023-07-05', lastRef:'csg',
     dims:{ h:{ v:53, ref:'esa' }, d:{ v:5.4, ref:'esa' }, mass:{ v:780, ref:'esa' } },
@@ -64,7 +65,7 @@ var MISSIONS = [
     ]
   },
   {
-    id:'ariane6', name:'Ariane 64', short:'Ariane 6', year:'2024',
+    id:'ariane6', name:'Ariane 64', short:'Ariane 6', year:'2024', group:'eu',
     agency:'ESA, ArianeGroup ; exploité par Arianespace',
     first:'2024-07-09', firstRef:'esa1',
     dims:{ h:{ v:62, ref:'cnes' }, d:{ v:5.4, ref:'esa' }, mass:{ v:860, ref:'cnes' } },
@@ -109,7 +110,7 @@ var MISSIONS = [
     ]
   },
   {
-    id:'vegac', name:'Vega-C', short:'Vega-C', year:'2022',
+    id:'vegac', name:'Vega-C', short:'Vega-C', year:'2022', group:'eu',
     agency:'ESA, Avio ; exploité par Avio',
     first:'2022-07-13', firstRef:'csg',
     dims:{ h:{ v:34.8, ref:'csg' }, d:{ v:3.4, ref:'csg' }, mass:{ v:210, ref:'csg' } },
@@ -154,7 +155,7 @@ var MISSIONS = [
     ]
   },
   {
-    id:'falcon9', name:'Falcon 9 Block 5', short:'Falcon 9', year:'2010',
+    id:'falcon9', name:'Falcon 9 Block 5', short:'Falcon 9', year:'2010', group:'us',
     agency:'SpaceX',
     first:'2010-06-04', firstRef:'wp',
     dims:{ h:{ v:70, ref:'wv' }, d:{ v:3.7, ref:'wv' }, mass:{ v:549, ref:'wv' } },
@@ -197,7 +198,7 @@ var MISSIONS = [
     ]
   },
   {
-    id:'falconheavy', name:'Falcon Heavy', short:'Falcon Heavy', year:'2018',
+    id:'falconheavy', name:'Falcon Heavy', short:'Falcon Heavy', year:'2018', group:'us',
     agency:'SpaceX',
     first:'2018-02-06', firstRef:'wp',
     dims:{ h:{ v:70, ref:'wp' }, d:{ v:3.7, ref:'wp' }, mass:{ v:1420, ref:'wp' } },
@@ -241,7 +242,7 @@ var MISSIONS = [
     ]
   },
   {
-    id:'sls', name:'SLS Block 1', short:'SLS', year:'2022',
+    id:'sls', name:'SLS Block 1', short:'SLS', year:'2022', group:'us',
     agency:'NASA ; Boeing (étage central), Northrop Grumman (propulseurs)',
     first:'2022-11-16', firstRef:'nasa',
     dims:{ h:{ v:98.3, ref:'nasa1b' }, d:{ v:8.4, ref:'wp', approx:true }, mass:{ v:2610, ref:'wp' } },
@@ -289,7 +290,7 @@ var MISSIONS = [
     ]
   },
   {
-    id:'soyuz2', name:'Soyouz-2', short:'Soyouz', year:'2004',
+    id:'soyuz2', name:'Soyouz-2', short:'Soyouz', year:'2004', group:'ru',
     agency:'Roscosmos ; construit par RKTs Progress',
     first:'2004-11-08', firstRef:'wp',
     dims:{ h:{ v:46.3, ref:'wp' }, d:{ v:2.95, ref:'wp' }, mass:{ v:312, ref:'wp' } },
@@ -331,7 +332,7 @@ var MISSIONS = [
     ]
   },
   {
-    id:'cz5', name:'Longue Marche 5', short:'Longue Marche 5', year:'2016',
+    id:'cz5', name:'Longue Marche 5', short:'Longue Marche 5', year:'2016', group:'cn',
     agency:'CASC ; construit par la CALT',
     first:'2016-11-03', firstRef:'wp',
     dims:{ h:{ v:56.97, ref:'wp' }, d:{ v:5, ref:'wp' }, mass:{ v:851.8, ref:'wp' } },
@@ -376,7 +377,7 @@ var MISSIONS = [
     ]
   },
   {
-    id:'saturnv', name:'Saturn V', short:'Saturn V', year:'1967',
+    id:'saturnv', name:'Saturn V', short:'Saturn V', year:'1967', group:'us',
     agency:'NASA ; étages construits par Boeing, North American et Douglas',
     first:'1967-11-09', firstRef:'wp', last:'1973-05-14', lastRef:'wp',
     dims:{ h:{ v:111, ref:'wp' }, d:{ v:10, ref:'wp' }, mass:{ v:2965, ref:'wp' }, thrust:{ v:34500, ref:'wp' } },
@@ -421,7 +422,7 @@ var MISSIONS = [
     ]
   },
   {
-    id:'shuttle', name:'Navette spatiale américaine', short:'Navette', year:'1981',
+    id:'shuttle', name:'Navette spatiale américaine', short:'Navette', year:'1981', group:'us',
     agency:'NASA ; orbiteur construit par Rockwell, réservoir par Martin Marietta, propulseurs par Thiokol',
     first:'1981-04-12', firstRef:'wp', last:'2011-07-21', lastRef:'wp',
     dims:{ h:{ v:56, ref:'wp' }, d:{ v:8.7, ref:'wp' }, mass:{ v:2030, ref:'wp' } },
@@ -465,7 +466,7 @@ var MISSIONS = [
     ]
   },
   {
-    id:'delta2', name:'Delta II', short:'Delta II', year:'1989',
+    id:'delta2', name:'Delta II', short:'Delta II', year:'1989', group:'us',
     agency:'McDonnell Douglas, puis Boeing, puis United Launch Alliance',
     first:'1989-02-14', firstRef:'wp', last:'2018-09-15', lastRef:'wp',
     dims:{ h:{ v:38.9, ref:'wp' }, d:{ v:2.44, ref:'wp' }, mass:{ v:286.1, ref:'wp' } },
@@ -509,7 +510,7 @@ var MISSIONS = [
     ]
   },
   {
-    id:'atlas5', name:'Atlas V', short:'Atlas V', year:'2002',
+    id:'atlas5', name:'Atlas V', short:'Atlas V', year:'2002', group:'us',
     agency:'United Launch Alliance (développé par Lockheed Martin)',
     first:'2002-08-21', firstRef:'wp',
     dims:{ h:{ v:58.3, ref:'wp' }, d:{ v:3.81, ref:'wp' }, mass:{ v:590, ref:'wp' } },
@@ -551,7 +552,7 @@ var MISSIONS = [
     ]
   },
   {
-    id:'titan4', name:'Titan IV', short:'Titan IV', year:'1989',
+    id:'titan4', name:'Titan IV', short:'Titan IV', year:'1989', group:'us',
     agency:'US Air Force ; construit par Martin Marietta, puis Lockheed Martin',
     first:'1989-06-14', firstRef:'wp', last:'2005-10-19', lastRef:'wp',
     dims:{ h:{ v:62, ref:'wp' }, d:{ v:3.05, ref:'wp' }, mass:{ v:943, ref:'wp' } },
@@ -595,7 +596,7 @@ var MISSIONS = [
     ]
   },
   {
-    id:'protonm', name:'Proton-M', short:'Proton-M', year:'2001',
+    id:'protonm', name:'Proton-M', short:'Proton-M', year:'2001', group:'ru',
     agency:'Roscosmos ; construit par Khrounitchev',
     first:'2001-04-07', firstRef:'wp',
     dims:{ h:{ v:58.2, ref:'wp' }, d:{ v:7.4, ref:'wp' }, mass:{ v:705, ref:'wp' } },
@@ -639,7 +640,7 @@ var MISSIONS = [
     ]
   },
   {
-    id:'h2a', name:'H-IIA', short:'H-IIA', year:'2001',
+    id:'h2a', name:'H-IIA', short:'H-IIA', year:'2001', group:'jp',
     agency:'JAXA et Mitsubishi Heavy Industries',
     first:'2001-08-29', firstRef:'wp', last:'2025-06-28', lastRef:'wp',
     dims:{ h:{ v:53, ref:'wp' }, d:{ v:4, ref:'wp' }, mass:{ v:285, ref:'wp' } },
@@ -682,7 +683,7 @@ var MISSIONS = [
     ]
   },
   {
-    id:'pslv', name:'PSLV', short:'PSLV', year:'1993',
+    id:'pslv', name:'PSLV', short:'PSLV', year:'1993', group:'in',
     agency:'ISRO (Organisation indienne de recherche spatiale)',
     first:'1993-09-20', firstRef:'wp',
     dims:{ h:{ v:44, ref:'wp' }, d:{ v:2.8, ref:'wp' }, mass:{ v:320, ref:'wp' } },
@@ -728,7 +729,7 @@ var MISSIONS = [
     ]
   },
   {
-    id:'vega', name:'Vega', short:'Vega', year:'2012',
+    id:'vega', name:'Vega', short:'Vega', year:'2012', group:'eu',
     agency:'Arianespace pour l\'ESA et l\'ASI ; construit par Avio',
     first:'2012-02-13', firstRef:'wp', last:'2024-09-05', lastRef:'wp',
     dims:{ h:{ v:30, ref:'wp' }, d:{ v:3, ref:'wp' }, mass:{ v:137, ref:'wp' } },
@@ -771,7 +772,7 @@ var MISSIONS = [
     ]
   },
   {
-    id:'starship', name:'Starship', short:'Starship', year:'2023', status:'dev',
+    id:'starship', name:'Starship', short:'Starship', year:'2023', group:'us', status:'dev',
     agency:'SpaceX',
     first:'2023-04-20', firstRef:'wp',
     dims:{ h:{ v:123.1, ref:'wp' }, d:{ v:9, ref:'wp' }, mass:{ v:5000, ref:'wp', approx:true } },

@@ -21,8 +21,11 @@ function isDark(){ var a = document.documentElement.getAttribute('data-theme'); 
 var VIEWS = [['lanceurs', 'Lanceurs'], ['comparer', 'Comparer'], ['flotte', 'Flotte']];
 function renderHeader(route){
   var cur = launcher(route);
+  /* onglets rangés par famille (ordre fixé par views.js) : un écart avant le premier lanceur de chaque famille, dont le nom est dans l'infobulle */
+  var prev = null;
   $('tabs').innerHTML = cur ? '<div class="trow" role="tablist" aria-label="' + T('Lanceur') + '">' + MISSIONS.map(function(m){
-    return '<button class="tab" role="tab" data-go="' + m.id + '" aria-selected="' + (m.id === cur.id) + '">' + esc(m.short || m.name) + '<small>' + esc(m.year || '') + '</small></button>';
+    var g0 = m.group !== prev; prev = m.group;
+    return '<button class="tab' + (g0 ? ' g0' : '') + '" role="tab" title="' + esc(Views.groupName(m.group)) + '" data-go="' + m.id + '" aria-selected="' + (m.id === cur.id) + '">' + esc(m.short || m.name) + '<small>' + esc(m.year || '') + '</small></button>';
   }).join('') + '</div>' : '';
   $('views').innerHTML = '<div class="views">' + VIEWS.map(function(v){
     var on = route === v[0] || (v[0] === 'lanceurs' && cur);

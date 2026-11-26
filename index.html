@@ -338,7 +338,14 @@ figure{ margin:0 0 10px; } figcaption{ font-size:12.5px; line-height:1.45; color
 
 /* ---------- Comparer : silhouettes à l'échelle (src/views.js) ---------- */
 .cmp-fig{ background:var(--black); padding:8px 0 0; overflow-x:auto; }
-.cmp-fig svg{ display:block; height:auto; min-width:640px; width:100%; font-family:var(--f); }
+.cmp-fig svg{ display:block; height:auto; width:100%; max-height:calc(100vh - 120px); font-family:var(--f); }
+.cmp-text{ max-width:960px; }
+.cmp-fig .gh{ stroke:#AEB5BA; stroke-width:1; }
+.cmp-fig .gn{ fill:#fff; font-size:13px; font-weight:800; letter-spacing:.3px; }
+.cmp-tab tr.grp th{ padding-top:14px; font-size:12px; text-transform:uppercase; letter-spacing:.4px; color:var(--ink); border-bottom:1.5px solid var(--ink); }
+.fl-grp{ font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.4px; fill:var(--ink); }
+.fl-gl{ stroke:var(--ink); stroke-width:1; }
+#tabs .tab.g0:not(:first-child){ margin-left:10px; }
 .cmp-fig .gl{ stroke:#3A4046; stroke-width:1; }
 .cmp-fig .gt{ fill:#AEB5BA; font-size:11px; }
 .cmp-fig .nm{ fill:#fff; font-size:12.5px; font-weight:700; }
@@ -402,6 +409,7 @@ function OBS_NUM(s){ return OBS_LANG === 'en' ? String(s).replace(/(\d),(?!\d{3}
    Ajouter un lanceur = une entrée ici et ses textes anglais dans en/launchers.js ; app.js et views.js n'ont pas à changer.
    build.js et tools/pages.js lisent ce registre (une ligne « id:'…' » par lanceur, indentée de 4 espaces).
      id, name, short, year      identifiant (ancre #id), nom complet, nom court, année du premier vol
+     group                      famille d'affichage (pays ou région du lanceur) : eu, us, ru, cn, jp, in (ordre et noms : GROUPS dans views.js)
      agency                     constructeur et opérateur, en texte
      first, firstRef            date du premier vol (AAAA-MM-JJ) et sa source ; last, lastRef : dernier vol d'un lanceur retiré
      dims                       { h, d, mass } : hauteur (m), diamètre du corps central (m), masse au décollage (t) ;
@@ -418,7 +426,7 @@ function OBS_NUM(s){ return OBS_LANG === 'en' ? String(s).replace(/(\d),(?!\d{3}
 ================================================================= */
 var MISSIONS = [
   {
-    id:'ariane5', name:'Ariane 5 ECA', short:'Ariane 5', year:'1996',
+    id:'ariane5', name:'Ariane 5 ECA', short:'Ariane 5', year:'1996', group:'eu',
     agency:'ESA, ArianeGroup ; exploité par Arianespace',
     first:'1996-06-04', firstRef:'csg', last:'2023-07-05', lastRef:'csg',
     dims:{ h:{ v:53, ref:'esa' }, d:{ v:5.4, ref:'esa' }, mass:{ v:780, ref:'esa' } },
@@ -463,7 +471,7 @@ var MISSIONS = [
     ]
   },
   {
-    id:'ariane6', name:'Ariane 64', short:'Ariane 6', year:'2024',
+    id:'ariane6', name:'Ariane 64', short:'Ariane 6', year:'2024', group:'eu',
     agency:'ESA, ArianeGroup ; exploité par Arianespace',
     first:'2024-07-09', firstRef:'esa1',
     dims:{ h:{ v:62, ref:'cnes' }, d:{ v:5.4, ref:'esa' }, mass:{ v:860, ref:'cnes' } },
@@ -508,7 +516,7 @@ var MISSIONS = [
     ]
   },
   {
-    id:'vegac', name:'Vega-C', short:'Vega-C', year:'2022',
+    id:'vegac', name:'Vega-C', short:'Vega-C', year:'2022', group:'eu',
     agency:'ESA, Avio ; exploité par Avio',
     first:'2022-07-13', firstRef:'csg',
     dims:{ h:{ v:34.8, ref:'csg' }, d:{ v:3.4, ref:'csg' }, mass:{ v:210, ref:'csg' } },
@@ -553,7 +561,7 @@ var MISSIONS = [
     ]
   },
   {
-    id:'falcon9', name:'Falcon 9 Block 5', short:'Falcon 9', year:'2010',
+    id:'falcon9', name:'Falcon 9 Block 5', short:'Falcon 9', year:'2010', group:'us',
     agency:'SpaceX',
     first:'2010-06-04', firstRef:'wp',
     dims:{ h:{ v:70, ref:'wv' }, d:{ v:3.7, ref:'wv' }, mass:{ v:549, ref:'wv' } },
@@ -596,13 +604,13 @@ var MISSIONS = [
     ]
   },
   {
-    id:'falconheavy', name:'Falcon Heavy', short:'Falcon Heavy', year:'2018',
+    id:'falconheavy', name:'Falcon Heavy', short:'Falcon Heavy', year:'2018', group:'us',
     agency:'SpaceX',
     first:'2018-02-06', firstRef:'wp',
     dims:{ h:{ v:70, ref:'wp' }, d:{ v:3.7, ref:'wp' }, mass:{ v:1420, ref:'wp' } },
     cap:[ { o:'LEO', t:63.8, note:'sans récupération (28,5°)', ref:'wp' }, { o:'GTO', t:26.7, note:'sans récupération ; 8 t si les trois corps sont récupérés', ref:'wp' } ],
     sil:{ body:[ { d:3.7, h:42.6, k:'core' }, { d:3.7, h:14.3, k:'up' }, { d:5.2, h:13.1, k:'fair', nose:6 } ], bst:{ n:2, d:3.7, h:44, nose:4 } },
-    file:'models/falconheavy.glb', bytes:5210204, unit:1.057,
+    file:'models/falconheavy.glb', bytes:5215764, unit:1.057,
     model:{ src:'« SpaceX Falcon Heavy V4 », Clarence365 (Sketchfab)', license:'CC BY 4.0', u:'https://sketchfab.com/3d-models/spacex-falcon-heavy-v4-a91bccdf8e624997892bab2f0fbec28f', note:'Maquette regroupée par étage et allégée pour ce site (textures réduites). Mise à l\'échelle : 70 m de haut.' },
     view:{ az:0.6, el:0.12, dist:2.1 }, sun:[0.6, 0.5, 0.6],
     desc:'Trois premiers étages de Falcon 9 côte à côte, 27 moteurs Merlin allumés au décollage. Les deux propulseurs latéraux reviennent souvent se poser ensemble près du pas de tir. Il a lancé la sonde Psyche, le satellite météorologique GOES-U et la sonde Europa Clipper vers Jupiter.',
@@ -640,7 +648,7 @@ var MISSIONS = [
     ]
   },
   {
-    id:'sls', name:'SLS Block 1', short:'SLS', year:'2022',
+    id:'sls', name:'SLS Block 1', short:'SLS', year:'2022', group:'us',
     agency:'NASA ; Boeing (étage central), Northrop Grumman (propulseurs)',
     first:'2022-11-16', firstRef:'nasa',
     dims:{ h:{ v:98.3, ref:'nasa1b' }, d:{ v:8.4, ref:'wp', approx:true }, mass:{ v:2610, ref:'wp' } },
@@ -688,7 +696,7 @@ var MISSIONS = [
     ]
   },
   {
-    id:'soyuz2', name:'Soyouz-2', short:'Soyouz', year:'2004',
+    id:'soyuz2', name:'Soyouz-2', short:'Soyouz', year:'2004', group:'ru',
     agency:'Roscosmos ; construit par RKTs Progress',
     first:'2004-11-08', firstRef:'wp',
     dims:{ h:{ v:46.3, ref:'wp' }, d:{ v:2.95, ref:'wp' }, mass:{ v:312, ref:'wp' } },
@@ -730,7 +738,7 @@ var MISSIONS = [
     ]
   },
   {
-    id:'cz5', name:'Longue Marche 5', short:'Longue Marche 5', year:'2016',
+    id:'cz5', name:'Longue Marche 5', short:'Longue Marche 5', year:'2016', group:'cn',
     agency:'CASC ; construit par la CALT',
     first:'2016-11-03', firstRef:'wp',
     dims:{ h:{ v:56.97, ref:'wp' }, d:{ v:5, ref:'wp' }, mass:{ v:851.8, ref:'wp' } },
@@ -775,7 +783,7 @@ var MISSIONS = [
     ]
   },
   {
-    id:'saturnv', name:'Saturn V', short:'Saturn V', year:'1967',
+    id:'saturnv', name:'Saturn V', short:'Saturn V', year:'1967', group:'us',
     agency:'NASA ; étages construits par Boeing, North American et Douglas',
     first:'1967-11-09', firstRef:'wp', last:'1973-05-14', lastRef:'wp',
     dims:{ h:{ v:111, ref:'wp' }, d:{ v:10, ref:'wp' }, mass:{ v:2965, ref:'wp' }, thrust:{ v:34500, ref:'wp' } },
@@ -820,13 +828,13 @@ var MISSIONS = [
     ]
   },
   {
-    id:'shuttle', name:'Navette spatiale américaine', short:'Navette', year:'1981',
+    id:'shuttle', name:'Navette spatiale américaine', short:'Navette', year:'1981', group:'us',
     agency:'NASA ; orbiteur construit par Rockwell, réservoir par Martin Marietta, propulseurs par Thiokol',
     first:'1981-04-12', firstRef:'wp', last:'2011-07-21', lastRef:'wp',
     dims:{ h:{ v:56, ref:'wp' }, d:{ v:8.7, ref:'wp' }, mass:{ v:2030, ref:'wp' } },
     cap:[ { o:'LEO', t:27.5, note:'204 km', ref:'wp' }, { o:'GTO', t:4.94, note:'avec l\'étage IUS emporté dans la soute', ref:'wp' } ],
     sil:{ body:[ { d:8.4, h:47, k:'core', nose:9 } ], bst:{ n:2, d:3.7, h:45, nose:5 }, side:{ d:5.2, h:37.2, y:6, nose:4 } },
-    file:'models/shuttle.glb', bytes:2431468, unit:1.264,
+    file:'models/shuttle.glb', bytes:2432116, unit:1.264,
     model:{ src:'« Space Shuttle (A) », NASA 3D Resources', license:'NASA (libre de droits)', u:'https://github.com/nasa/NASA-3D-Resources/tree/master/3D%20Models/Space%20Shuttle%20(A)', note:'Maquette sans couleurs de la NASA, redressée et regroupée en trois éléments pour ce site. Mise à l\'échelle sur la longueur du réservoir externe (47 m) : les autres longueurs sont approchées.' },
     view:{ az:0.6, el:0.12, dist:2.1 }, sun:[0.6, 0.5, 0.6],
     desc:'Le premier véhicule orbital conçu pour être réutilisé : l\'orbiteur, avec son équipage, revenait se poser comme un planeur, et les propulseurs à poudre étaient repêchés en mer ; seul le grand réservoir orange était perdu. En trente ans, elle a lancé et réparé le télescope Hubble, lancé Chandra, Galileo, Magellan et Ulysses, et assemblé la Station spatiale internationale. Deux accidents, Challenger en 1986 et Columbia en 2003, ont coûté la vie à 14 astronautes.',
@@ -864,7 +872,7 @@ var MISSIONS = [
     ]
   },
   {
-    id:'delta2', name:'Delta II', short:'Delta II', year:'1989',
+    id:'delta2', name:'Delta II', short:'Delta II', year:'1989', group:'us',
     agency:'McDonnell Douglas, puis Boeing, puis United Launch Alliance',
     first:'1989-02-14', firstRef:'wp', last:'2018-09-15', lastRef:'wp',
     dims:{ h:{ v:38.9, ref:'wp' }, d:{ v:2.44, ref:'wp' }, mass:{ v:286.1, ref:'wp' } },
@@ -908,7 +916,7 @@ var MISSIONS = [
     ]
   },
   {
-    id:'atlas5', name:'Atlas V', short:'Atlas V', year:'2002',
+    id:'atlas5', name:'Atlas V', short:'Atlas V', year:'2002', group:'us',
     agency:'United Launch Alliance (développé par Lockheed Martin)',
     first:'2002-08-21', firstRef:'wp',
     dims:{ h:{ v:58.3, ref:'wp' }, d:{ v:3.81, ref:'wp' }, mass:{ v:590, ref:'wp' } },
@@ -950,13 +958,13 @@ var MISSIONS = [
     ]
   },
   {
-    id:'titan4', name:'Titan IV', short:'Titan IV', year:'1989',
+    id:'titan4', name:'Titan IV', short:'Titan IV', year:'1989', group:'us',
     agency:'US Air Force ; construit par Martin Marietta, puis Lockheed Martin',
     first:'1989-06-14', firstRef:'wp', last:'2005-10-19', lastRef:'wp',
     dims:{ h:{ v:62, ref:'wp' }, d:{ v:3.05, ref:'wp' }, mass:{ v:943, ref:'wp' } },
     cap:[ { o:'LEO', t:21.68, ref:'wp' } ],
     sil:{ body:[ { d:3.05, h:26.4, k:'core' }, { d:3.05, h:10, k:'up' }, { d:5.1, h:25.6, k:'fair', nose:6 } ], bst:{ n:2, d:3.2, h:34, nose:4 } },
-    file:'models/titan4.glb', bytes:522628, unit:4.539,
+    file:'models/titan4.glb', bytes:523532, unit:4.539,
     model:{ src:'« Titan IV », AllThingsSpace (Sketchfab)', license:'CC BY 4.0', u:'https://sketchfab.com/3d-models/titan-iv-0560341d278d4308b7a330ca4e75f1ae', note:'Maquette d\'une Titan IVB ; seul l\'exemplaire assemblé est gardé (la maquette d\'origine en montre aussi un éclaté). Redécoupée en étages pour ce site d\'après la position de chaque face (tools/models/cut.js) : les limites entre étages sont approchées. Mise à l\'échelle : 62 m de haut.' },
     view:{ az:0.6, el:0.12, dist:2.1 }, sun:[0.6, 0.5, 0.6],
     desc:'Le lanceur lourd de l\'armée de l\'air américaine dans les années 1990. Ses deux étages brûlaient des ergols stockables, et deux énormes propulseurs à poudre l\'aidaient au décollage. Une seule de ses missions n\'était pas militaire : Cassini-Huygens, partie vers Saturne en 1997.',
@@ -994,7 +1002,7 @@ var MISSIONS = [
     ]
   },
   {
-    id:'protonm', name:'Proton-M', short:'Proton-M', year:'2001',
+    id:'protonm', name:'Proton-M', short:'Proton-M', year:'2001', group:'ru',
     agency:'Roscosmos ; construit par Khrounitchev',
     first:'2001-04-07', firstRef:'wp',
     dims:{ h:{ v:58.2, ref:'wp' }, d:{ v:7.4, ref:'wp' }, mass:{ v:705, ref:'wp' } },
@@ -1038,7 +1046,7 @@ var MISSIONS = [
     ]
   },
   {
-    id:'h2a', name:'H-IIA', short:'H-IIA', year:'2001',
+    id:'h2a', name:'H-IIA', short:'H-IIA', year:'2001', group:'jp',
     agency:'JAXA et Mitsubishi Heavy Industries',
     first:'2001-08-29', firstRef:'wp', last:'2025-06-28', lastRef:'wp',
     dims:{ h:{ v:53, ref:'wp' }, d:{ v:4, ref:'wp' }, mass:{ v:285, ref:'wp' } },
@@ -1081,7 +1089,7 @@ var MISSIONS = [
     ]
   },
   {
-    id:'pslv', name:'PSLV', short:'PSLV', year:'1993',
+    id:'pslv', name:'PSLV', short:'PSLV', year:'1993', group:'in',
     agency:'ISRO (Organisation indienne de recherche spatiale)',
     first:'1993-09-20', firstRef:'wp',
     dims:{ h:{ v:44, ref:'wp' }, d:{ v:2.8, ref:'wp' }, mass:{ v:320, ref:'wp' } },
@@ -1127,7 +1135,7 @@ var MISSIONS = [
     ]
   },
   {
-    id:'vega', name:'Vega', short:'Vega', year:'2012',
+    id:'vega', name:'Vega', short:'Vega', year:'2012', group:'eu',
     agency:'Arianespace pour l\'ESA et l\'ASI ; construit par Avio',
     first:'2012-02-13', firstRef:'wp', last:'2024-09-05', lastRef:'wp',
     dims:{ h:{ v:30, ref:'wp' }, d:{ v:3, ref:'wp' }, mass:{ v:137, ref:'wp' } },
@@ -1170,13 +1178,13 @@ var MISSIONS = [
     ]
   },
   {
-    id:'starship', name:'Starship', short:'Starship', year:'2023', status:'dev',
+    id:'starship', name:'Starship', short:'Starship', year:'2023', group:'us', status:'dev',
     agency:'SpaceX',
     first:'2023-04-20', firstRef:'wp',
     dims:{ h:{ v:123.1, ref:'wp' }, d:{ v:9, ref:'wp' }, mass:{ v:5000, ref:'wp', approx:true } },
     cap:[ { o:'LEO', t:100, note:'objectif annoncé pour la version réutilisable (Block 3) ; 35 t pour la Block 2', approx:true, ref:'wp' }, { o:'GTO', t:27, note:'objectif annoncé, version réutilisable', approx:true, ref:'wp' } ],
     sil:{ body:[ { d:9, h:71, k:'core' }, { d:9, h:52.1, k:'up', nose:12 } ] },
-    file:'models/starship.glb', bytes:6259568, unit:4.946,
+    file:'models/starship.glb', bytes:6262288, unit:4.946,
     model:{ src:'« SpaceX Starship Block 3 », Clarence365 (Sketchfab)', license:'CC BY 4.0', u:'https://sketchfab.com/3d-models/spacex-starship-block-3-6f6c6f88a3eb4b4d822fdca66733fbb2', note:'Maquette de la version Block 3, regroupée en deux étages et allégée pour ce site. Mise à l\'échelle : 124,4 m de haut (Block 3).' },
     view:{ az:0.6, el:0.12, dist:2.1 }, sun:[0.6, 0.5, 0.6],
     desc:'Le plus grand lanceur jamais construit, encore en développement. Ses deux étages, le propulseur Super Heavy et le vaisseau Starship, brûlent du méthane et de l\'oxygène liquides et doivent être entièrement réutilisables : le propulseur revient se faire attraper par la tour de lancement, une première réussie le 13 octobre 2024. Treize vols d\'essai ont eu lieu à la date de la fiche.',
@@ -1543,6 +1551,9 @@ var EN_UI = {
   "Valeurs vérifiées le":"Values checked on", "« ≈ » : valeur approchée.":"“≈”: approximate value.",
   "Tous les lanceurs à la même échelle, et leurs capacités.":"All launchers at the same scale, and their capabilities.",
   "Lanceurs à la même échelle":"Launchers at the same scale",
+  "Europe":"Europe", "États-Unis":"United States", "Russie":"Russia", "Chine":"China", "Japon":"Japan", "Inde":"India",
+  "Les lanceurs côte à côte, à la même échelle, rangés par pays ou région. Cliquer une silhouette ouvre la vue 3D du lanceur.":"The launchers side by side, at the same scale, grouped by country or region. Click a silhouette to open the launcher's 3D view.",
+  "Premier vol et période de service de chaque lanceur, par pays ou région.":"First flight and service period of each launcher, by country or region.",
   "Les lanceurs côte à côte, à la même échelle. Cliquer une silhouette ouvre la vue 3D du lanceur.":"The launchers side by side, at the same scale. Click a silhouette to open the launcher's 3D view.",
   "Trait jaune à gauche : une personne de 1,8 m.":"Yellow line on the left: a 1.8 m tall person.",
   "Silhouettes simplifiées (schéma) : hauteur totale et diamètres publiés, longueurs d'étages approchées, deux propulseurs d'appoint dessinés même quand il y en a quatre. Version la plus haute de chaque lanceur.":"Simplified silhouettes (diagram): published total height and diameters, approximate stage lengths, two boosters drawn even when there are four. Tallest version of each launcher.",
@@ -1798,6 +1809,15 @@ function n(v, d){ if (v == null) return '—'; var s = (d != null ? v.toFixed(d)
 function src(m, k){ var r = k && m.refs[k]; return r ? ' <a class="src" href="' + esc(r.u) + '" rel="noopener" target="_blank" title="' + esc(r.t) + '">' + esc(T(r.p)) + '</a>' : ''; }
 function approx(o){ return o && o.approx ? '≈ ' : ''; }
 
+/* ---------- familles : les lanceurs sont rangés par pays ou région, puis par premier vol ---------- */
+var GROUPS = [['eu', 'Europe'], ['us', 'États-Unis'], ['ru', 'Russie'], ['cn', 'Chine'], ['jp', 'Japon'], ['in', 'Inde']];
+var GI = {}; GROUPS.forEach(function(g, i){ GI[g[0]] = i; });
+MISSIONS.sort(function(a, b){ return (GI[a.group] - GI[b.group]) || (a.first < b.first ? -1 : a.first > b.first ? 1 : 0); });
+function groupName(id){ for (var i = 0; i < GROUPS.length; i++) if (GROUPS[i][0] === id) return T(GROUPS[i][1]); return ''; }
+/* [[groupe, [lanceurs…]], …] dans l'ordre de GROUPS */
+function byGroup(){ var out = []; MISSIONS.forEach(function(m){ var l = out[out.length - 1]; if (!l || l[0] !== m.group) out.push(l = [m.group, []]); l[1].push(m); }); return out; }
+function grpRow(g, n){ return '<tr class="grp"><th scope="colgroup" colspan="' + n + '">' + esc(groupName(g)) + '</th></tr>'; }
+
 /* ---------- silhouettes (schéma) ---------- */
 /* m.sil = { body:[{ d, h, k:'core'|'up'|'fair'|'cap', nose }], bst:{ n, d, h, nose }, side:{ d, h, y, nose } } : du bas vers le haut, en mètres.
    nose : hauteur de la partie effilée en haut du segment (coiffe, tour de sauvetage, pointe des propulseurs). */
@@ -1821,57 +1841,72 @@ function silhouette(m, cx, base, k){
 }
 function comparer(){
   var L = MISSIONS, H = 0; L.forEach(function(m){ H = Math.max(H, m.dims.h.v); });
-  var top = 34, bottom = 54, plotH = 440, k = plotH / (Math.ceil(H / 10) * 10), gap = 26, x = 70, cols = [];
-  L.forEach(function(m){ var w = Math.max(silWidth(m) * k, 60); cols.push({ m:m, x:x + w / 2, w:w }); x += w + gap; });
-  var human = 1.8, W = x + 40, base = top + plotH, g = '';
+  /* toute la largeur de la page : colonnes serrées, noms longs sur deux lignes, un écart plus grand et un titre entre familles */
+  var top = 52, bottom = 62, plotH = 460, k = plotH / (Math.ceil(H / 10) * 10), gap = 12, ggap = 30, x = 66, cols = [], heads = [];
+  byGroup().forEach(function(G, gi){
+    if (gi) x += ggap - gap;
+    var x0 = x;
+    G[1].forEach(function(m){ var w = Math.max(silWidth(m) * k, 50); cols.push({ m:m, x:x + w / 2, w:w }); x += w + gap; });
+    heads.push({ g:G[0], a:x0, b:x - gap });
+  });
+  var human = 1.8, W = x + 10, base = top + plotH, g = '';
   for (var hgt = 0; hgt <= H + 0.1; hgt += 10){ var yy = base - hgt * k; g += '<line class="gl" x1="40" x2="' + (W - 10) + '" y1="' + yy.toFixed(1) + '" y2="' + yy.toFixed(1) + '"/><text class="gt" x="36" y="' + (yy + 4).toFixed(1) + '" text-anchor="end">' + hgt + ' m</text>'; }
+  heads.forEach(function(h){
+    g += '<line class="gh" x1="' + h.a.toFixed(1) + '" x2="' + h.b.toFixed(1) + '" y1="' + (top - 30) + '" y2="' + (top - 30) + '"/><text class="gn" x="' + h.a.toFixed(1) + '" y="' + (top - 36) + '">' + esc(groupName(h.g)) + '</text>';
+  });
   cols.forEach(function(c){
-    var m = c.m, h = m.dims.h.v * k;
+    var m = c.m, h = m.dims.h.v * k, nm = String(m.short), sp = -1;
+    if (nm.length > 9) nm.replace(/ /g, function(_, i){ if (sp < 0 || Math.abs(i - nm.length / 2) < Math.abs(sp - nm.length / 2)) sp = i; });   /* coupure la plus proche du milieu */
+    var lines = sp > 0 ? [nm.slice(0, sp), nm.slice(sp + 1)] : [nm];
     g += '<a href="#' + m.id + '" aria-label="' + esc(m.name) + ', ' + n(m.dims.h.v) + ' m">' +
-      '<rect class="bx" x="' + (c.x - c.w / 2 - 4).toFixed(1) + '" y="' + (base - h - 4).toFixed(1) + '" width="' + (c.w + 8).toFixed(1) + '" height="' + (h + 40).toFixed(1) + '"/>' +
+      '<rect class="bx" x="' + (c.x - c.w / 2 - 4).toFixed(1) + '" y="' + (base - h - 4).toFixed(1) + '" width="' + (c.w + 8).toFixed(1) + '" height="' + (h + 52).toFixed(1) + '"/>' +
       silhouette(m, c.x, base, k) +
-      '<text class="nm" x="' + c.x.toFixed(1) + '" y="' + (base + 18) + '" text-anchor="middle">' + esc(m.short) + '</text>' +
-      '<text class="hm" x="' + c.x.toFixed(1) + '" y="' + (base + 33) + '" text-anchor="middle">' + approx(m.dims.h) + n(m.dims.h.v) + ' m</text></a>';
+      lines.map(function(l, i){ return '<text class="nm" x="' + c.x.toFixed(1) + '" y="' + (base + 17 + i * 14) + '" text-anchor="middle">' + esc(l) + '</text>'; }).join('') +
+      '<text class="hm" x="' + c.x.toFixed(1) + '" y="' + (base + 18 + lines.length * 14) + '" text-anchor="middle">' + approx(m.dims.h) + n(m.dims.h.v) + ' m</text></a>';
   });
   /* silhouette humaine (1,8 m) à la même échelle, au pied de la grille */
   var hx = 54, hh = human * k;
   g += '<rect x="' + (hx - 0.6) + '" y="' + (base - hh).toFixed(1) + '" width="1.6" height="' + hh.toFixed(1) + '" fill="#FFD21F"/>';
-  var svg = '<svg viewBox="0 0 ' + W.toFixed(0) + ' ' + (base + bottom) + '" style="min-width:' + Math.round(W * 0.85) + 'px" role="group" aria-label="' + T('Lanceurs à la même échelle') + '"><desc>' +
+  var svg = '<svg viewBox="0 0 ' + W.toFixed(0) + ' ' + (base + bottom) + '" style="min-width:' + Math.round(W * 0.7) + 'px" role="group" aria-label="' + T('Lanceurs à la même échelle') + '"><desc>' +
     L.map(function(m){ return esc(m.name) + ' ' + n(m.dims.h.v) + ' m'; }).join(', ') + '. ' + T('Trait jaune à gauche : une personne de 1,8 m.') + '</desc>' + g + '</svg>';
-  var dimRows = L.map(function(m){ var d = m.dims;
-    return '<tr><th scope="row"><a href="#' + m.id + '">' + esc(m.name) + '</a></th><td class="num">' + approx(d.h) + n(d.h.v) + ' m' + src(m, d.h.ref) + '</td><td class="num">' + approx(d.d) + n(d.d.v) + ' m' + src(m, d.d.ref) + '</td><td class="num">' + (d.mass ? approx(d.mass) + n(d.mass.v) + ' t' + src(m, d.mass.ref) : '—') + '</td><td class="num">' + (d.thrust ? approx(d.thrust) + n(d.thrust.v) + ' kN' + src(m, d.thrust.ref) : '—') + '</td></tr>'; }).join('');
+  var dimRows = byGroup().map(function(G){ return grpRow(G[0], 5) + G[1].map(function(m){ var d = m.dims;
+    return '<tr><th scope="row"><a href="#' + m.id + '">' + esc(m.name) + '</a></th><td class="num">' + approx(d.h) + n(d.h.v) + ' m' + src(m, d.h.ref) + '</td><td class="num">' + approx(d.d) + n(d.d.v) + ' m' + src(m, d.d.ref) + '</td><td class="num">' + (d.mass ? approx(d.mass) + n(d.mass.v) + ' t' + src(m, d.mass.ref) : '—') + '</td><td class="num">' + (d.thrust ? approx(d.thrust) + n(d.thrust.v) + ' kN' + src(m, d.thrust.ref) : '—') + '</td></tr>'; }).join(''); }).join('');
   var ORB = [['LEO', T('Orbite basse')], ['GTO', T('Transfert géostationnaire')], ['TLI', T('Vers la Lune')]];
-  var capRows = L.map(function(m){
+  var capRows = byGroup().map(function(G){ return grpRow(G[0], 4) + G[1].map(function(m){
     return '<tr><th scope="row"><a href="#' + m.id + '">' + esc(m.name) + '</a></th>' + ORB.map(function(o){
       var c = (m.cap || []).filter(function(x){ return x.o === o[0]; })[0];
       return '<td class="num">' + (c ? approx(c) + n(c.t) + ' t' + src(m, c.ref) + (c.note ? '<small>' + esc(T(c.note)) + '</small>' : '') : '—') + '</td>';
-    }).join('') + '</tr>'; }).join('');
-  return '<div class="sk wide"><h2>' + T('Comparer') + '</h2>' +
-    '<p class="lead">' + T('Les lanceurs côte à côte, à la même échelle. Cliquer une silhouette ouvre la vue 3D du lanceur.') + '</p>' +
-    '<figure class="cmp-fig">' + svg + '</figure>' +
+    }).join('') + '</tr>'; }).join(''); }).join('');
+  return '<div class="sk full"><h2>' + T('Comparer') + '</h2>' +
+    '<p class="lead">' + T('Les lanceurs côte à côte, à la même échelle, rangés par pays ou région. Cliquer une silhouette ouvre la vue 3D du lanceur.') + '</p>' +
+    '<figure class="cmp-fig">' + svg + '</figure><div class="cmp-text">' +
     '<p class="note">' + T('Silhouettes simplifiées (schéma) : hauteur totale et diamètres publiés, longueurs d\'étages approchées, deux propulseurs d\'appoint dessinés même quand il y en a quatre. Version la plus haute de chaque lanceur.') + '</p>' +
     '<h3>' + T('Dimensions') + '</h3><table class="sk-table cmp-tab"><thead><tr><th scope="col">' + T('Lanceur') + '</th><th scope="col" class="num">' + T('Hauteur') + '</th><th scope="col" class="num">' + T('Diamètre') + '</th><th scope="col" class="num">' + T('Masse au décollage') + '</th><th scope="col" class="num">' + T('Poussée au décollage') + '</th></tr></thead><tbody>' + dimRows + '</tbody></table>' +
     '<h3>' + T('Capacités') + '</h3><table class="sk-table cmp-tab"><thead><tr><th scope="col">' + T('Lanceur') + '</th>' + ORB.map(function(o){ return '<th scope="col" class="num">' + o[1] + '</th>'; }).join('') + '</tr></thead><tbody>' + capRows + '</tbody></table>' +
-    '<p class="note">' + T('Masse utile maximale annoncée par le constructeur ou l\'opérateur, pour l\'orbite de référence indiquée sous chaque chiffre ; les orbites de référence diffèrent d\'un lanceur à l\'autre, donc les chiffres ne se comparent qu\'en ordre de grandeur.') + '</p></div>';
+    '<p class="note">' + T('Masse utile maximale annoncée par le constructeur ou l\'opérateur, pour l\'orbite de référence indiquée sous chaque chiffre ; les orbites de référence diffèrent d\'un lanceur à l\'autre, donc les chiffres ne se comparent qu\'en ordre de grandeur.') + '</p></div></div>';
 }
 
 /* ---------- Flotte ---------- */
 function flotte(){
-  var L = MISSIONS.slice().sort(function(a, b){ return a.first < b.first ? -1 : 1; });
-  var y0 = Math.floor(Math.min.apply(null, L.map(function(m){ return +m.first.slice(0, 4); })) / 10) * 10, y1 = new Date().getUTCFullYear() + 1, W = 900, left = 150, right = 20, rowH = 40, top = 26;
+  var L = MISSIONS, GR = byGroup();
+  var y0 = Math.floor(Math.min.apply(null, L.map(function(m){ return +m.first.slice(0, 4); })) / 10) * 10, y1 = new Date().getUTCFullYear() + 1, W = 900, left = 150, right = 20, rowH = 34, gH = 30, top = 26;
   var X = function(d){ var t = typeof d === 'string' ? (+d.slice(0, 4) + ((+d.slice(5, 7) || 1) - 1) / 12) : d; return left + (t - y0) / (y1 - y0) * (W - left - right); };
-  var H = top + L.length * rowH + 10, g = '';
+  var H = top + L.length * rowH + GR.length * gH + 4, g = '';
   for (var y = y0; y <= y1; y += (y1 - y0 > 40 ? 10 : 5)){ g += '<line class="fl-grid" x1="' + X(y).toFixed(1) + '" x2="' + X(y).toFixed(1) + '" y1="' + (top - 6) + '" y2="' + (H - 6) + '"/><text class="fl-year" x="' + X(y).toFixed(1) + '" y="' + (top - 10) + '" text-anchor="middle">' + y + '</text>'; }
-  var today = new Date().toISOString().slice(0, 10);
-  L.forEach(function(m, i){
-    var yy = top + i * rowH + 14, a = X(m.first), b = X(m.last || today);
-    g += '<a href="#' + m.id + '"><text class="fl-lab" x="' + (left - 10) + '" y="' + (yy + 4) + '" text-anchor="end">' + esc(m.short) + '</text></a>' +
-      '<rect class="fl-bar' + (m.last ? ' off' : m.status === 'dev' ? ' dev' : '') + '" x="' + a.toFixed(1) + '" y="' + (yy - 5) + '" width="' + Math.max(2, b - a).toFixed(1) + '" height="10"><title>' + esc(m.name) + '</title></rect>' +
-      '<circle class="fl-mark" cx="' + a.toFixed(1) + '" cy="' + yy + '" r="5"/>';
+  var today = new Date().toISOString().slice(0, 10), yy = top;
+  GR.forEach(function(G){
+    yy += gH; g += '<text class="fl-grp" x="0" y="' + (yy - 9) + '">' + esc(groupName(G[0])) + '</text><line class="fl-gl" x1="0" x2="' + (W - right) + '" y1="' + (yy - 4) + '" y2="' + (yy - 4) + '"/>';
+    G[1].forEach(function(m){
+      var c = yy + 14, a = X(m.first), b = X(m.last || today);
+      g += '<a href="#' + m.id + '"><text class="fl-lab" x="' + (left - 10) + '" y="' + (c + 4) + '" text-anchor="end">' + esc(m.short) + '</text></a>' +
+        '<rect class="fl-bar' + (m.last ? ' off' : m.status === 'dev' ? ' dev' : '') + '" x="' + a.toFixed(1) + '" y="' + (c - 5) + '" width="' + Math.max(2, b - a).toFixed(1) + '" height="10"><title>' + esc(m.name) + '</title></rect>' +
+        '<circle class="fl-mark" cx="' + a.toFixed(1) + '" cy="' + c + '" r="5"/>';
+      yy += rowH;
+    });
   });
-  var rows = L.map(function(m){ var st = m.last ? T('Retiré') : m.status === 'dev' ? T('En développement') : T('En service');
-    return '<tr><th scope="row"><a href="#' + m.id + '">' + esc(m.name) + '</a></th><td>' + esc(m.agency) + '</td><td>' + esc(m.first) + src(m, m.firstRef) + '</td><td>' + (m.last ? esc(m.last) + src(m, m.lastRef) : '—') + '</td><td>' + st + '</td></tr>'; }).join('');
-  return '<div class="sk wide"><h2>' + T('Flotte') + '</h2><p class="lead">' + T('Premier vol et période de service de chaque lanceur.') + '</p>' +
+  var rows = GR.map(function(G){ return grpRow(G[0], 5) + G[1].map(function(m){ var st = m.last ? T('Retiré') : m.status === 'dev' ? T('En développement') : T('En service');
+    return '<tr><th scope="row"><a href="#' + m.id + '">' + esc(m.name) + '</a></th><td>' + esc(m.agency) + '</td><td>' + esc(m.first) + src(m, m.firstRef) + '</td><td>' + (m.last ? esc(m.last) + src(m, m.lastRef) : '—') + '</td><td>' + st + '</td></tr>'; }).join(''); }).join('');
+  return '<div class="sk wide"><h2>' + T('Flotte') + '</h2><p class="lead">' + T('Premier vol et période de service de chaque lanceur, par pays ou région.') + '</p>' +
     '<figure class="fl-fig"><svg viewBox="0 0 ' + W + ' ' + H + '" role="group" aria-label="' + T('Frise des lanceurs, du premier vol à aujourd\'hui ou au dernier vol') + '">' + g + '</svg></figure>' +
     '<p class="note">' + T('Barre foncée : en service ; barre hachurée : en développement ; barre claire : retiré. Point orange : premier vol.') + '</p>' +
     '<table class="sk-table cmp-tab"><thead><tr><th scope="col">' + T('Lanceur') + '</th><th scope="col">' + T('Opérateur') + '</th><th scope="col">' + T('Premier vol') + '</th><th scope="col">' + T('Dernier vol') + '</th><th scope="col">' + T('État') + '</th></tr></thead><tbody>' + rows + '</tbody></table></div>';
@@ -1879,6 +1914,7 @@ function flotte(){
 
 var PAGES = { comparer:comparer, flotte:flotte };
 return {
+  groupName:groupName,
   page:function(r){ return PAGES[r] ? PAGES[r]() : null; },
   mount:function(){}
 };
@@ -1907,8 +1943,11 @@ function isDark(){ var a = document.documentElement.getAttribute('data-theme'); 
 var VIEWS = [['lanceurs', 'Lanceurs'], ['comparer', 'Comparer'], ['flotte', 'Flotte']];
 function renderHeader(route){
   var cur = launcher(route);
+  /* onglets rangés par famille (ordre fixé par views.js) : un écart avant le premier lanceur de chaque famille, dont le nom est dans l'infobulle */
+  var prev = null;
   $('tabs').innerHTML = cur ? '<div class="trow" role="tablist" aria-label="' + T('Lanceur') + '">' + MISSIONS.map(function(m){
-    return '<button class="tab" role="tab" data-go="' + m.id + '" aria-selected="' + (m.id === cur.id) + '">' + esc(m.short || m.name) + '<small>' + esc(m.year || '') + '</small></button>';
+    var g0 = m.group !== prev; prev = m.group;
+    return '<button class="tab' + (g0 ? ' g0' : '') + '" role="tab" title="' + esc(Views.groupName(m.group)) + '" data-go="' + m.id + '" aria-selected="' + (m.id === cur.id) + '">' + esc(m.short || m.name) + '<small>' + esc(m.year || '') + '</small></button>';
   }).join('') + '</div>' : '';
   $('views').innerHTML = '<div class="views">' + VIEWS.map(function(v){
     var on = route === v[0] || (v[0] === 'lanceurs' && cur);
